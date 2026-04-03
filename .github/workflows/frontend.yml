@@ -25,7 +25,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install dependencies
         working-directory: apps/web
-        run: npm ci
+        run: npm ci --legacy-peer-deps
       - name: Lint
         working-directory: apps/web
         run: npm run lint
@@ -47,7 +47,7 @@ jobs:
           cache-dependency-path: apps/web/package-lock.json
       - name: Install dependencies
         working-directory: apps/web
-        run: npm ci
+        run: npm ci --legacy-peer-deps
       - name: Build Next.js
         working-directory: apps/web
         env:
