@@ -1,0 +1,38 @@
+# Go
+services/api/bin/
+services/judge/bin/
+*.exe
+*.test
+*.out
+
+# Node
+apps/web/node_modules/
+apps/web/.next/
+apps/web/out/
+apps/web/.env.local
+
+# Environment files — never commit secrets
+.env
+.env.local
+.env.production
+*.pem
+*.key
+
+# Terraform
+infrastructure/terraform/.terraform/
+infrastructure/terraform/*.tfstate
+infrastructure/terraform/*.tfstate.backup
+infrastructure/terraform/.terraform.lock.hcl
+
+# Docker
+docker-compose.override.yml
+
+# IDE & AI tools (local only — not shared via git)
+.vscode/
+.idea/
+*.swp
+.cursor/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,79 @@
+# Production compose — used on each EC2 instance via SSM deploy commands.
+# All secrets come from environment variables / AWS SSM Parameter Store.
+# No ports are exposed directly — traffic flows through Nginx → ALB → Cloudflare.
+
+services:
+  api:
+    image: ${ECR_REGISTRY}/prepforall-api:${IMAGE_TAG:-latest}
+    container_name: prepforall_api
+    restart: always
+    expose:
+      - "8080"
+    environment:
+      ENV: production
+      PORT: "8080"
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_ADDR: ${REDIS_ADDR}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRY: ${JWT_EXPIRY:-24h}
+      AWS_REGION: ${AWS_REGION:-ap-south-1}
+      S3_BUCKET: ${S3_BUCKET}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-'["https://prepforall.com"]'}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: prepforall_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/nginx/conf.d:/etc/nginx/conf.d:ro
+      - /etc/ssl:/etc/ssl:ro
+      - /var/log/nginx:/var/log/nginx
+    depends_on:
+      api:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "3"
+
+  promtail:
+    image: grafana/promtail:3.3.2
+    container_name: prepforall_promtail
+    restart: always
+    volumes:
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/promtail/config.yml:/etc/promtail/config.yml:ro
+    command: -config.file=/etc/promtail/config.yml
+
+  node_exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: prepforall_node_exporter
+    restart: always
+    expose:
+      - "9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.rootfs=/rootfs"
+      - "--path.sysfs=/host/sys"
+      - "--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)"
