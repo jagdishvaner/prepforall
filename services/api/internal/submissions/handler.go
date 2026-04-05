@@ -42,6 +42,10 @@ func (h *Handler) Submit(w http.ResponseWriter, r *http.Request) {
 		errors.WriteError(w, errors.ErrBadRequest)
 		return
 	}
+	if req.ProblemSlug == "" || req.Language == "" || req.Code == "" {
+		errors.WriteError(w, errors.ErrBadRequest)
+		return
+	}
 
 	sub, err := h.service.Submit(r.Context(), userID, req)
 	if err != nil {
@@ -57,6 +61,10 @@ func (h *Handler) Run(w http.ResponseWriter, r *http.Request) {
 
 	var req RunRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		errors.WriteError(w, errors.ErrBadRequest)
+		return
+	}
+	if req.ProblemSlug == "" || req.Language == "" || req.Code == "" {
 		errors.WriteError(w, errors.ErrBadRequest)
 		return
 	}

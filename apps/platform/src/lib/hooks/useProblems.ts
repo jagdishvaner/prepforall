@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../queryKeys';
 import { apiClient } from '../apiClient';
+import type { Problem } from '../api/problems';
 
 export interface ProblemsFilter {
   difficulty?: string;
@@ -24,7 +25,7 @@ export function useProblem(slug: string) {
   return useQuery({
     queryKey: queryKeys.problems.detail(slug),
     queryFn: async () => {
-      const { data } = await apiClient.get(`/api/v1/problems/${slug}`);
+      const { data } = await apiClient.get<Problem>(`/api/v1/problems/${slug}`);
       return data;
     },
     staleTime: 10 * 60_000,

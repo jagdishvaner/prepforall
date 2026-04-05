@@ -99,9 +99,9 @@ func (c *ResultConsumer) process(ctx context.Context, msg redis.XMessage) {
 func (c *ResultConsumer) writeVerdict(ctx context.Context, e queue.ResultEvent) error {
 	_, err := c.db.Exec(ctx,
 		`UPDATE submissions
-		 SET verdict = $1, runtime_ms = $2, memory_kb = $3, judged_at = NOW()
-		 WHERE id = $4`,
-		e.Verdict, e.RuntimeMs, e.MemoryKB, e.SubmissionID,
+		 SET verdict = $1, runtime_ms = $2, memory_kb = $3, passed_cases = $4, total_cases = $5, judged_at = NOW()
+		 WHERE id = $6`,
+		e.Verdict, e.RuntimeMs, e.MemoryKB, e.PassedCases, e.TotalCases, e.SubmissionID,
 	)
 	return err
 }

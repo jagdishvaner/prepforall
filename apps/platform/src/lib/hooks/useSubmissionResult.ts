@@ -20,7 +20,13 @@ export function useSubmissionResult(submissionId: string | null) {
       () => setIsJudging(false)
     );
 
-    return cleanup;
+    // Timeout fallback: if no result after 30s, stop judging state
+    const timeout = setTimeout(() => setIsJudging(false), 30_000);
+
+    return () => {
+      cleanup();
+      clearTimeout(timeout);
+    };
   }, [submissionId]);
 
   return { result, isJudging };
