@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProblemsIndexRouteImport } from './routes/problems/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as ProblemsSlugRouteImport } from './routes/problems/$slug'
 import { Route as AuthSetupRouteImport } from './routes/auth/setup'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthOauthCallbackRouteImport } from './routes/auth/oauth-callback'
@@ -31,6 +32,11 @@ const ProblemsIndexRoute = ProblemsIndexRouteImport.update({
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/dashboard/',
   path: '/dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProblemsSlugRoute = ProblemsSlugRouteImport.update({
+  id: '/problems/$slug',
+  path: '/problems/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthSetupRoute = AuthSetupRouteImport.update({
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/auth/oauth-callback': typeof AuthOauthCallbackRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/setup': typeof AuthSetupRoute
+  '/problems/$slug': typeof ProblemsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/problems/': typeof ProblemsIndexRoute
 }
@@ -76,6 +83,7 @@ export interface FileRoutesByTo {
   '/auth/oauth-callback': typeof AuthOauthCallbackRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/setup': typeof AuthSetupRoute
+  '/problems/$slug': typeof ProblemsSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/problems': typeof ProblemsIndexRoute
 }
@@ -87,6 +95,7 @@ export interface FileRoutesById {
   '/auth/oauth-callback': typeof AuthOauthCallbackRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/auth/setup': typeof AuthSetupRoute
+  '/problems/$slug': typeof ProblemsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/problems/': typeof ProblemsIndexRoute
 }
@@ -99,6 +108,7 @@ export interface FileRouteTypes {
     | '/auth/oauth-callback'
     | '/auth/reset-password'
     | '/auth/setup'
+    | '/problems/$slug'
     | '/dashboard/'
     | '/problems/'
   fileRoutesByTo: FileRoutesByTo
@@ -109,6 +119,7 @@ export interface FileRouteTypes {
     | '/auth/oauth-callback'
     | '/auth/reset-password'
     | '/auth/setup'
+    | '/problems/$slug'
     | '/dashboard'
     | '/problems'
   id:
@@ -119,6 +130,7 @@ export interface FileRouteTypes {
     | '/auth/oauth-callback'
     | '/auth/reset-password'
     | '/auth/setup'
+    | '/problems/$slug'
     | '/dashboard/'
     | '/problems/'
   fileRoutesById: FileRoutesById
@@ -130,6 +142,7 @@ export interface RootRouteChildren {
   AuthOauthCallbackRoute: typeof AuthOauthCallbackRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSetupRoute: typeof AuthSetupRoute
+  ProblemsSlugRoute: typeof ProblemsSlugRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   ProblemsIndexRoute: typeof ProblemsIndexRoute
 }
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/problems/$slug': {
+      id: '/problems/$slug'
+      path: '/problems/$slug'
+      fullPath: '/problems/$slug'
+      preLoaderRoute: typeof ProblemsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/setup': {
@@ -202,6 +222,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthOauthCallbackRoute: AuthOauthCallbackRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSetupRoute: AuthSetupRoute,
+  ProblemsSlugRoute: ProblemsSlugRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   ProblemsIndexRoute: ProblemsIndexRoute,
 }
