@@ -4,7 +4,9 @@
   "private": true,
   "license": "MIT",
   "main": "index.js",
-  "files": ["*.js"],
+  "files": [
+    "*.js"
+  ],
   "dependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

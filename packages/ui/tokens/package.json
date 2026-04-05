@@ -10,7 +10,9 @@
     "./spacing": "./src/spacing.css",
     "./typography": "./src/typography.css"
   },
-  "files": ["src/**/*.css"],
+  "files": [
+    "src/**/*.css"
+  ],
   "scripts": {
     "build:css": "echo 'tokens: raw CSS — no build step'",
     "clean": "echo 'tokens: nothing to clean'"

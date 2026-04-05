@@ -4,7 +4,9 @@
   "private": true,
   "license": "MIT",
   "main": "index.js",
-  "files": ["index.js"],
+  "files": [
+    "index.js"
+  ],
   "dependencies": {
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.38",

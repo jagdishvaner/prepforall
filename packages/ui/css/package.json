@@ -8,7 +8,9 @@
     ".": "./dist/index.css",
     "./components/*": "./dist/components/*.module.css"
   },
-  "files": ["dist/**/*.css"],
+  "files": [
+    "dist/**/*.css"
+  ],
   "scripts": {
     "build:css": "node scripts/build.js",
     "dev": "node scripts/build.js --watch",
@@ -19,9 +21,9 @@
   },
   "devDependencies": {
     "@prepforall/postcss-config": "workspace:*",
+    "glob": "^11.0.0",
     "postcss": "^8.4.38",
     "postcss-cli": "^11.0.0",
-    "postcss-modules": "^6.0.1",
-    "glob": "^11.0.0"
+    "postcss-modules": "^6.0.1"
   }
 }
