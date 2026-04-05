@@ -70,8 +70,10 @@ services:
     environment:
       REDIS_ADDR: redis:6379
       SANDBOX_RUNTIME: runc  # use runc for local dev (gVisor needs Linux kernel)
+      JUDGE_WORK_DIR: /judge-work  # shared volume for code files
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - judge-work:/judge-work
     depends_on:
       redis:
         condition: service_healthy
@@ -170,3 +172,4 @@ volumes:
   postgres_data:
   redis_data:
   grafana_data:
+  judge-work:

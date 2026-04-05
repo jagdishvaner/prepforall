@@ -69,7 +69,11 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 		}
 	}
 
-	workDir, err := os.MkdirTemp("", "judge-*")
+	baseDir := os.Getenv("JUDGE_WORK_DIR")
+	if baseDir == "" {
+		baseDir = os.TempDir()
+	}
+	workDir, err := os.MkdirTemp(baseDir, "judge-*")
 	if err != nil {
 		return ExecuteResult{SubmissionID: req.SubmissionID, Verdict: VerdictRE, ErrorMsg: "failed to create work dir"}
 	}
