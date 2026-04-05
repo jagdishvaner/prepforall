@@ -19,6 +19,12 @@ const config: Config = {
       colors: {
         "brand-primary": "var(--color-brand-primary)",
         "brand-accent": "var(--color-brand-accent)",
+        "brand-dark": "#042729",
+        "surface-warm": "#fcfcfa",
+        "surface-cream": "#f8f5ee",
+        "surface-salmon": "#fcded2",
+        "text-primary": "#1f1f1f",
+        "text-secondary": "#516f90",
       },
       maxWidth: {
         content: "1080px",

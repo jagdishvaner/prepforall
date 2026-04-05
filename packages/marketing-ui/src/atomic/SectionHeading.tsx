@@ -14,18 +14,20 @@ export function SectionHeading({
   light = false,
 }: SectionHeadingProps) {
   const alignClass = align === "center" ? "text-center" : "text-left";
-  const colorClass = light ? "text-white" : "text-gray-900";
-  const subtitleColor = light ? "text-gray-300" : "text-gray-600";
+  const colorClass = light ? "text-white" : "text-text-primary";
+  const subtitleColor = light ? "text-gray-300" : "text-text-secondary";
 
   return (
-    <div className={`mb-12 ${alignClass}`}>
+    <div className={`mb-16 ${alignClass}`}>
       <h2
-        className={`font-heading text-3xl font-bold tracking-tight md:text-4xl ${colorClass}`}
+        className={`font-heading text-4xl font-semibold leading-tight tracking-tight md:text-5xl lg:text-6xl ${colorClass}`}
       >
         {children}
       </h2>
       {subtitle && (
-        <p className={`mt-4 text-lg ${subtitleColor}`}>{subtitle}</p>
+        <p className={`mx-auto mt-6 max-w-2xl text-lg leading-relaxed md:text-xl ${subtitleColor}`}>
+          {subtitle}
+        </p>
       )}
     </div>
   );

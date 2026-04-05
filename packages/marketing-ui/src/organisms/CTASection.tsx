@@ -8,14 +8,14 @@ export interface CTASectionProps {
 
 export function CTASection({ heading, ctaLabel, ctaHref }: CTASectionProps) {
   return (
-    <SectionWrapper background="dark">
+    <SectionWrapper background="brand-dark">
       <div className="text-center">
-        <h2 className="font-heading text-3xl font-bold text-white md:text-4xl">
+        <h2 className="font-heading text-4xl font-semibold leading-tight tracking-tight text-white md:text-5xl lg:text-6xl">
           {heading}
         </h2>
         <a
           href={ctaHref}
-          className="mt-8 inline-block rounded-lg bg-brand-accent px-10 py-4 text-sm font-semibold text-white transition-colors hover:bg-brand-accent/90"
+          className="mt-10 inline-block rounded-lg bg-brand-primary px-10 py-4 text-base font-medium text-white transition-all hover:brightness-110"
         >
           {ctaLabel}
         </a>

@@ -17,7 +17,7 @@ export interface OfferSectionProps {
 
 export function OfferSection({ heading, subtitle, offers }: OfferSectionProps) {
   return (
-    <SectionWrapper background="white">
+    <SectionWrapper background="cream">
       <SectionHeading subtitle={subtitle}>{heading}</SectionHeading>
       <div className="grid gap-8 md:grid-cols-3">
         {offers.map((offer) => (

@@ -15,12 +15,21 @@ export interface StatBarProps {
 export function StatBar({ stats }: StatBarProps) {
   return (
     <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-      {stats.map((stat) => (
-        <div key={stat.label} className="text-center">
-          <p className="text-3xl font-bold text-white md:text-4xl">
+      {stats.map((stat, index) => (
+        <div
+          key={stat.label}
+          className={`text-center ${
+            index < stats.length - 1
+              ? "md:border-r md:border-white/15"
+              : ""
+          }`}
+        >
+          <p className="text-5xl font-bold text-white md:text-6xl">
             <AnimatedCounter target={stat.value} suffix={stat.suffix} />
           </p>
-          <p className="mt-2 text-sm text-gray-300">{stat.label}</p>
+          <p className="mt-3 text-sm font-medium uppercase tracking-wider text-gray-400">
+            {stat.label}
+          </p>
         </div>
       ))}
     </div>

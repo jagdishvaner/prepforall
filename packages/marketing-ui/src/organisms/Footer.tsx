@@ -28,14 +28,20 @@ export function Footer({
   copyright,
 }: FooterProps) {
   return (
-    <footer className="bg-gray-900 px-6 py-16 text-gray-400">
+    <footer className="bg-brand-dark px-6 py-20 text-gray-400">
       <div className="mx-auto max-w-[1080px]">
         <div className="grid gap-12 md:grid-cols-5">
           {/* Brand column */}
           <div className="md:col-span-2">
-            <img src={logoSrc} alt="PrepForAll" width={140} height={32} />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed">{tagline}</p>
-            <div className="mt-6 flex gap-4">
+            <img
+              src={logoSrc}
+              alt="PrepForAll"
+              className="h-10 w-auto brightness-0 invert"
+            />
+            <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-gray-400">
+              {tagline}
+            </p>
+            <div className="mt-8 flex gap-5">
               {socialLinks.map((social) => (
                 <a
                   key={social.platform}
@@ -54,13 +60,15 @@ export function Footer({
           {/* Link columns */}
           {columns.map((col) => (
             <div key={col.title}>
-              <h3 className="mb-4 text-sm font-semibold text-white">{col.title}</h3>
-              <ul className="space-y-3">
+              <h3 className="mb-5 text-sm font-semibold uppercase tracking-wider text-white">
+                {col.title}
+              </h3>
+              <ul className="space-y-4">
                 {col.links.map((link) => (
                   <li key={link.href}>
                     <a
                       href={link.href}
-                      className="text-sm transition-colors hover:text-white"
+                      className="text-[15px] transition-colors hover:text-white"
                     >
                       {link.label}
                     </a>
@@ -71,7 +79,7 @@ export function Footer({
           ))}
         </div>
 
-        <div className="mt-12 border-t border-gray-800 pt-8 text-center text-sm">
+        <div className="mt-16 border-t border-white/10 pt-8 text-center text-sm text-gray-500">
           {copyright}
         </div>
       </div>

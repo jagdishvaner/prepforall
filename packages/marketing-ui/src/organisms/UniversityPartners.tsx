@@ -19,16 +19,19 @@ export function UniversityPartners({ heading, partners }: UniversityPartnersProp
   const doubled = [...partners, ...partners];
 
   return (
-    <SectionWrapper background="white">
+    <SectionWrapper background="cream">
       <SectionHeading>{heading}</SectionHeading>
       <div className="relative overflow-hidden">
-        <div className="flex animate-scroll gap-12">
+        {/* Fade edges */}
+        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-surface-cream to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-surface-cream to-transparent" />
+        <div className="flex animate-scroll gap-16 py-4">
           {doubled.map((partner, index) => (
             <BrandLogo
               key={`${partner.name}-${index}`}
               src={partner.logoSrc}
               alt={partner.name}
-              className="flex-shrink-0"
+              className="flex-shrink-0 opacity-60 grayscale transition-all hover:opacity-100 hover:grayscale-0"
             />
           ))}
         </div>

@@ -4,8 +4,14 @@
 
 @layer base {
   :root {
-    --color-brand-primary: #2563eb;
-    --color-brand-accent: #3b82f6;
+    --color-brand-primary: #ff5c35;
+    --color-brand-accent: #ff5c35;
+    --color-brand-dark: #042729;
+    --color-surface-warm: #fcfcfa;
+    --color-surface-cream: #f8f5ee;
+    --color-surface-salmon: #fcded2;
+    --color-text-primary: #1f1f1f;
+    --color-text-secondary: #516f90;
   }
 
   html {
@@ -13,10 +19,19 @@
   }
 
   body {
-    @apply font-body text-gray-900 antialiased;
+    @apply font-body antialiased;
+    background-color: var(--color-surface-warm);
+    color: var(--color-text-primary);
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  p {
+    line-height: 1.7;
   }
 }

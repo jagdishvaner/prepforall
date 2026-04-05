@@ -1,6 +1,6 @@
 {
   "header": {
-    "logoSrc": "/images/logo.svg",
+    "logoSrc": "/images/logo.jpeg",
     "navLinks": [
       { "label": "Problems", "href": "/problems" },
       { "label": "Features", "href": "/features" },
@@ -11,7 +11,7 @@
     "ctaHref": "/for-universities"
   },
   "footer": {
-    "logoSrc": "/images/logo-white.svg",
+    "logoSrc": "/images/logo.jpeg",
     "tagline": "Your end-to-end coding platform for practice, assessments & placement preparation.",
     "columns": [
       {

@@ -16,23 +16,27 @@ export function TestimonialCard({
   photoUrl,
 }: TestimonialCardProps) {
   return (
-    <div className="mx-auto max-w-2xl text-center">
-      <blockquote className="text-xl leading-relaxed text-gray-700 md:text-2xl">
-        &ldquo;{quote}&rdquo;
-      </blockquote>
-      <div className="mt-8 flex items-center justify-center gap-4">
-        <img
-          src={photoUrl}
-          alt={name}
-          width={56}
-          height={56}
-          className="h-14 w-14 rounded-full object-cover"
-        />
-        <div className="text-left">
-          <p className="font-semibold text-gray-900">{name}</p>
-          <p className="text-sm text-gray-500">
-            {role}, {institution}
-          </p>
+    <div className="mx-auto max-w-3xl rounded-2xl bg-white p-10 shadow-sm">
+      <div className="text-center">
+        {/* Large quote mark */}
+        <div className="mb-6 text-5xl leading-none text-brand-primary">&ldquo;</div>
+        <blockquote className="text-xl leading-relaxed text-text-primary md:text-2xl">
+          {quote}
+        </blockquote>
+        <div className="mt-8 flex items-center justify-center gap-4">
+          <img
+            src={photoUrl}
+            alt={name}
+            width={56}
+            height={56}
+            className="h-14 w-14 rounded-full object-cover ring-2 ring-brand-primary/20"
+          />
+          <div className="text-left">
+            <p className="font-semibold text-text-primary">{name}</p>
+            <p className="text-sm text-text-secondary">
+              {role}, {institution}
+            </p>
+          </div>
         </div>
       </div>
     </div>

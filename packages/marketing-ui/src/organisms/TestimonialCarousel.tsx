@@ -17,16 +17,18 @@ export function TestimonialCarousel({
   const [current, setCurrent] = useState(0);
 
   return (
-    <SectionWrapper background="gray">
+    <SectionWrapper background="salmon">
       <SectionHeading>{heading}</SectionHeading>
       <TestimonialCard {...testimonials[current]} />
-      <div className="mt-8 flex justify-center gap-2">
+      <div className="mt-10 flex justify-center gap-3">
         {testimonials.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrent(index)}
-            className={`h-2.5 w-2.5 rounded-full transition-colors ${
-              index === current ? "bg-brand-primary" : "bg-gray-300"
+            className={`h-3 w-3 rounded-full transition-all ${
+              index === current
+                ? "bg-brand-primary scale-110"
+                : "bg-gray-300 hover:bg-gray-400"
             }`}
             aria-label={`Go to testimonial ${index + 1}`}
           />

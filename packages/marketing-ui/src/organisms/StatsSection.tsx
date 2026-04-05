@@ -7,7 +7,7 @@ export interface StatsSectionProps {
 
 export function StatsSection({ stats }: StatsSectionProps) {
   return (
-    <SectionWrapper background="dark" className="!py-10">
+    <SectionWrapper background="brand-dark" className="!py-16 lg:!py-20">
       <StatBar stats={stats} />
     </SectionWrapper>
   );
