@@ -10,7 +10,11 @@ import (
 
 type contextKey string
 
-const UserIDKey contextKey = "user_id"
+const (
+	UserIDKey contextKey = "user_id"
+	RoleKey   contextKey = "role"
+	OrgIDKey  contextKey = "org_id"
+)
 
 func Authenticate(jwtSecret string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -37,7 +41,17 @@ func Authenticate(jwtSecret string) func(http.Handler) http.Handler {
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), UserIDKey, claims["sub"])
+			ctx := r.Context()
+			if sub, ok := claims["sub"].(string); ok {
+				ctx = context.WithValue(ctx, UserIDKey, sub)
+			}
+			if role, ok := claims["role"].(string); ok {
+				ctx = context.WithValue(ctx, RoleKey, role)
+			}
+			if orgID, ok := claims["org_id"].(string); ok {
+				ctx = context.WithValue(ctx, OrgIDKey, orgID)
+			}
+
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
