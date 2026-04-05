@@ -101,25 +101,14 @@ export function ${componentName}({ size = 24, width, height, ...props }: ${compo
   });
 
   // 5. Generate TypeScript declarations
-  // Run tsc to generate .d.ts files from the generated TSX source
-  const { execSync } = require("child_process");
-  try {
-    execSync(
-      "npx tsc --project tsconfig.json --emitDeclarationOnly --declaration --outDir dist",
-      { cwd: path.resolve(__dirname, ".."), stdio: "inherit" }
-    );
-  } catch {
-    // Fallback: generate a simple declaration file from the exports
-    const dtsLines = [];
-    for (const file of svgFiles) {
-      const name = path.basename(file, ".svg");
-      const componentName = `Icon${toPascalCase(name)}`;
-      dtsLines.push(`import type { SVGProps } from "react";`);
-      dtsLines.push(`export interface ${componentName}Props extends SVGProps<SVGSVGElement> { size?: number | string; }`);
-      dtsLines.push(`export declare function ${componentName}(props: ${componentName}Props): JSX.Element;`);
-    }
-    fs.writeFileSync(path.join(DIST_DIR, "index.d.ts"), dtsLines.join("\n") + "\n");
+  const dtsLines = ['import type { SVGProps } from "react";', ''];
+  for (const file of svgFiles) {
+    const name = path.basename(file, ".svg");
+    const componentName = `Icon${toPascalCase(name)}`;
+    dtsLines.push(`export interface ${componentName}Props extends SVGProps<SVGSVGElement> { size?: number | string; }`);
+    dtsLines.push(`export declare function ${componentName}(props: ${componentName}Props): React.JSX.Element;`);
   }
+  fs.writeFileSync(path.join(DIST_DIR, "index.d.ts"), dtsLines.join("\n") + "\n");
 
   console.log(`@prepforall/icons: Built ${svgFiles.length} icon components`);
 }
