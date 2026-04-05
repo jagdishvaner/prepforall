@@ -23,10 +23,12 @@ export function ProblemWorkspace({ slug }: Props) {
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Load starter code if no saved code exists (prefer problem-specific, fallback to generic)
+  // Load starter code if no saved code exists
+  // Wait for problem to load before setting code — otherwise generic template
+  // gets saved before the API returns problem-specific starter code
   let code = getCode(slug, language);
-  if (!code) {
-    const starter = problem?.starterCode?.[language] ?? DEFAULT_STARTER_CODE[language] ?? '';
+  if (!code && problem) {
+    const starter = problem.starterCode?.[language] ?? DEFAULT_STARTER_CODE[language] ?? '';
     if (starter) {
       code = starter;
       setCode(slug, language, code);
