@@ -14,7 +14,7 @@ export function useProblems(filter: ProblemsFilter = {}) {
     queryKey: queryKeys.problems.list(filter as Record<string, unknown>),
     queryFn: async () => {
       const { data } = await apiClient.get('/api/v1/problems', { params: filter });
-      return data;
+      return Array.isArray(data) ? data : [];
     },
     staleTime: 5 * 60_000,
   });

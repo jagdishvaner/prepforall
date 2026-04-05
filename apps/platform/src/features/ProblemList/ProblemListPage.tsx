@@ -24,7 +24,8 @@ export function ProblemListPage() {
   const navigate = useNavigate();
 
   const filter: ProblemsFilter = { q: search, difficulty: difficultyFilter, tab: activeTab };
-  const { data: problems = [], isLoading } = useProblems(filter);
+  const { data, isLoading } = useProblems(filter);
+  const problems = Array.isArray(data) ? data : [];
 
   const columns: ColumnDef<any>[] = [
     { accessorKey: 'title', header: 'Title', cell: ({ row }) => (
