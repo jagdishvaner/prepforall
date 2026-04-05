@@ -81,12 +81,14 @@ func (c *ResultConsumer) process(ctx context.Context, msg redis.XMessage) {
 		return
 	}
 
-	if err := c.writeVerdict(ctx, event); err != nil {
-		c.log.Error("failed to write verdict to DB", zap.String("submissionId", event.SubmissionID), zap.Error(err))
-		return
+	// Only write to DB for submit mode (run mode has no submission row)
+	if event.Mode != "run" {
+		if err := c.writeVerdict(ctx, event); err != nil {
+			c.log.Error("failed to write verdict to DB", zap.String("submissionId", event.SubmissionID), zap.Error(err))
+			return
+		}
+		metrics.VerdictTotal.WithLabelValues(event.Verdict, "").Inc()
 	}
-
-	metrics.VerdictTotal.WithLabelValues(event.Verdict, "").Inc()
 
 	notifyPayload, _ := json.Marshal(event)
 	c.hub.Broker().Publish(ctx, event.SubmissionID, notifyPayload)
