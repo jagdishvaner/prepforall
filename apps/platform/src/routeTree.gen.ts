@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as ProblemsIndexRouteImport } from './routes/problems/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as ProblemsSlugRouteImport } from './routes/problems/$slug'
@@ -22,6 +23,11 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-pas
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProblemsIndexRoute = ProblemsIndexRouteImport.update({
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/problems/$slug': typeof ProblemsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/problems/': typeof ProblemsIndexRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/problems/$slug': typeof ProblemsSlugRoute
   '/dashboard': typeof DashboardIndexRoute
   '/problems': typeof ProblemsIndexRoute
+  '/profile': typeof ProfileIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/problems/$slug': typeof ProblemsSlugRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/problems/': typeof ProblemsIndexRoute
+  '/profile/': typeof ProfileIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/dashboard/'
     | '/problems/'
+    | '/profile/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/dashboard'
     | '/problems'
+    | '/profile'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/problems/$slug'
     | '/dashboard/'
     | '/problems/'
+    | '/profile/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   ProblemsSlugRoute: typeof ProblemsSlugRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   ProblemsIndexRoute: typeof ProblemsIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -154,6 +167,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/problems/': {
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProblemsSlugRoute: ProblemsSlugRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   ProblemsIndexRoute: ProblemsIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
