@@ -15,13 +15,17 @@ import (
 )
 
 type Handler struct {
-	service *Service
+	service      *Service
+	secureCookie bool
 }
 
 func RegisterRoutes(r chi.Router, db *pgxpool.Pool, rdb *redis.Client, cfg *config.Config, log *zap.Logger) {
 	repo := NewRepository(db)
 	svc := NewService(repo, rdb, cfg, log)
-	h := &Handler{service: svc}
+	h := &Handler{
+		service:      svc,
+		secureCookie: cfg.Env == "production",
+	}
 
 	r.Route("/auth", func(r chi.Router) {
 		// Public routes
@@ -67,7 +71,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setRefreshCookie(w, refreshToken, h.service.refreshExpiry)
+	setRefreshCookie(w, refreshToken, h.service.refreshExpiry, h.secureCookie)
 	errors.WriteJSON(w, http.StatusCreated, resp)
 }
 
@@ -84,7 +88,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setRefreshCookie(w, refreshToken, h.service.refreshExpiry)
+	setRefreshCookie(w, refreshToken, h.service.refreshExpiry, h.secureCookie)
 	errors.WriteJSON(w, http.StatusOK, resp)
 }
 
@@ -97,12 +101,12 @@ func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
 
 	resp, newRefreshToken, appErr := h.service.RefreshTokens(r.Context(), cookie.Value)
 	if appErr != nil {
-		clearRefreshCookie(w)
+		clearRefreshCookie(w, h.secureCookie)
 		errors.WriteError(w, appErr)
 		return
 	}
 
-	setRefreshCookie(w, newRefreshToken, h.service.refreshExpiry)
+	setRefreshCookie(w, newRefreshToken, h.service.refreshExpiry, h.secureCookie)
 	errors.WriteJSON(w, http.StatusOK, resp)
 }
 
@@ -111,7 +115,7 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 	if cookie != nil {
 		h.service.BlacklistToken(r.Context(), cookie.Value)
 	}
-	clearRefreshCookie(w)
+	clearRefreshCookie(w, h.secureCookie)
 	errors.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
@@ -128,7 +132,7 @@ func (h *Handler) Setup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setRefreshCookie(w, refreshToken, h.service.refreshExpiry)
+	setRefreshCookie(w, refreshToken, h.service.refreshExpiry, h.secureCookie)
 	errors.WriteJSON(w, http.StatusCreated, resp)
 }
 
@@ -197,26 +201,34 @@ func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
 	errors.WriteJSON(w, http.StatusOK, resp)
 }
 
-func setRefreshCookie(w http.ResponseWriter, token string, expiry time.Duration) {
+func setRefreshCookie(w http.ResponseWriter, token string, expiry time.Duration, secure bool) {
+	sameSite := http.SameSiteLaxMode
+	if secure {
+		sameSite = http.SameSiteStrictMode
+	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    token,
 		Path:     "/api/v1/auth",
 		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		MaxAge:   int(expiry.Seconds()),
 	})
 }
 
-func clearRefreshCookie(w http.ResponseWriter) {
+func clearRefreshCookie(w http.ResponseWriter, secure bool) {
+	sameSite := http.SameSiteLaxMode
+	if secure {
+		sameSite = http.SameSiteStrictMode
+	}
 	http.SetCookie(w, &http.Cookie{
 		Name:     "refresh_token",
 		Value:    "",
 		Path:     "/api/v1/auth",
 		HttpOnly: true,
-		Secure:   true,
-		SameSite: http.SameSiteStrictMode,
+		Secure:   secure,
+		SameSite: sameSite,
 		MaxAge:   -1,
 	})
 }

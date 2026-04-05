@@ -22,7 +22,7 @@ func (h *Handler) GoogleLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    state,
 		Path:     "/api/v1/auth",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   h.secureCookie,
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   300,
 	})
@@ -47,7 +47,7 @@ func (h *Handler) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setRefreshCookie(w, refreshToken, h.service.refreshExpiry)
+	setRefreshCookie(w, refreshToken, h.service.refreshExpiry, h.secureCookie)
 	frontendCallback := h.service.frontendURL + "/auth/oauth-callback?access_token=" + result.AccessToken
 	http.Redirect(w, r, frontendCallback, http.StatusTemporaryRedirect)
 }
@@ -65,7 +65,7 @@ func (h *Handler) GithubLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    state,
 		Path:     "/api/v1/auth",
 		HttpOnly: true,
-		Secure:   true,
+		Secure:   h.secureCookie,
 		SameSite: http.SameSiteLaxMode,
 		MaxAge:   300,
 	})
@@ -90,7 +90,7 @@ func (h *Handler) GithubCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	setRefreshCookie(w, refreshToken, h.service.refreshExpiry)
+	setRefreshCookie(w, refreshToken, h.service.refreshExpiry, h.secureCookie)
 	frontendCallback := h.service.frontendURL + "/auth/oauth-callback?access_token=" + result.AccessToken
 	http.Redirect(w, r, frontendCallback, http.StatusTemporaryRedirect)
 }
