@@ -10,11 +10,17 @@ export const apiClient = axios.create({
   withCredentials: true, // send httpOnly cookies
 });
 
-// Attach access token to every request
+// Public endpoints that should NOT send the Authorization header
+const publicPaths = ['/api/v1/auth/login', '/api/v1/auth/register', '/api/v1/auth/setup', '/api/v1/auth/forgot-password', '/api/v1/auth/reset-password'];
+
+// Attach access token to every request (except public auth endpoints)
 apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-  const token = useAuthStore.getState().accessToken;
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  const isPublic = publicPaths.some((p) => config.url?.includes(p));
+  if (!isPublic) {
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
   return config;
 });
