@@ -16,26 +16,44 @@ const (
 	JudgeGroup       = "judge-workers"
 )
 
+type TestCaseData struct {
+	Input    string `json:"input"`
+	Expected string `json:"expected"`
+}
+
 type SubmissionJob struct {
-	SubmissionID string `json:"submission_id"`
-	ProblemID    string `json:"problem_id"`
-	UserID       string `json:"user_id"`
-	Language     string `json:"language"`
-	Code         string `json:"code"`
-	TimeLimitMs  int    `json:"time_limit_ms"`
-	MemoryLimitMB int   `json:"memory_limit_mb"`
-	EnqueuedAt   int64  `json:"enqueued_at"`
+	SubmissionID  string         `json:"submission_id"`
+	ProblemID     string         `json:"problem_id"`
+	UserID        string         `json:"user_id"`
+	Language      string         `json:"language"`
+	Code          string         `json:"code"`
+	TimeLimitMs   int            `json:"time_limit_ms"`
+	MemoryLimitMB int            `json:"memory_limit_mb"`
+	Mode          string         `json:"mode"` // "run" or "submit"
+	TestCases     []TestCaseData `json:"test_cases"`
+	EnqueuedAt    int64          `json:"enqueued_at"`
+}
+
+type CaseResult struct {
+	Index          int    `json:"index"`
+	Verdict        string `json:"verdict"`
+	Input          string `json:"input"`
+	ExpectedOutput string `json:"expected_output"`
+	ActualOutput   string `json:"actual_output"`
+	RuntimeMs      int    `json:"runtime_ms"`
 }
 
 type ResultEvent struct {
-	SubmissionID string `json:"submission_id"`
-	Verdict      string `json:"verdict"`
-	RuntimeMs    int    `json:"runtime_ms"`
-	MemoryKB     int    `json:"memory_kb"`
-	Output       string `json:"output"`
-	ErrorMsg     string `json:"error_msg"`
-	PassedCases  int    `json:"passed_cases"`
-	TotalCases   int    `json:"total_cases"`
+	SubmissionID string       `json:"submission_id"`
+	Verdict      string       `json:"verdict"`
+	RuntimeMs    int          `json:"runtime_ms"`
+	MemoryKB     int          `json:"memory_kb"`
+	Output       string       `json:"output"`
+	ErrorMsg     string       `json:"error_msg"`
+	PassedCases  int          `json:"passed_cases"`
+	TotalCases   int          `json:"total_cases"`
+	Mode         string       `json:"mode,omitempty"`
+	CaseResults  []CaseResult `json:"case_results,omitempty"`
 }
 
 func EnqueueSubmission(ctx context.Context, rdb *redis.Client, job SubmissionJob) error {

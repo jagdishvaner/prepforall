@@ -85,3 +85,26 @@ func (r *Repository) FindSampleTestCases(ctx context.Context, slug string) ([]*T
 	}
 	return cases, nil
 }
+
+func (r *Repository) FindAllTestCases(ctx context.Context, problemID string) ([]*TestCase, error) {
+	rows, err := r.db.Query(ctx,
+		`SELECT tc.id, tc.problem_id, tc.s3_input_key, tc.s3_output_key, tc.is_sample, tc.display_order
+		 FROM test_cases tc
+		 WHERE tc.problem_id = $1
+		 ORDER BY tc.display_order`, problemID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var cases []*TestCase
+	for rows.Next() {
+		var tc TestCase
+		if err := rows.Scan(&tc.ID, &tc.ProblemID, &tc.Input, &tc.Output, &tc.IsSample, &tc.Order); err != nil {
+			return nil, fmt.Errorf("scan test case: %w", err)
+		}
+		cases = append(cases, &tc)
+	}
+	return cases, nil
+}
