@@ -19,14 +19,14 @@ type Handler struct {
 	service *Service
 }
 
-func RegisterRoutes(r chi.Router, db *pgxpool.Pool, rdb *redis.Client, s3 *storage.S3Client, log *zap.Logger) {
+func RegisterRoutes(r chi.Router, db *pgxpool.Pool, rdb *redis.Client, s3 *storage.S3Client, jwtSecret string, log *zap.Logger) {
 	repo := NewRepository(db)
 	problemRepo := problems.NewRepository(db)
 	svc := NewService(repo, problemRepo, rdb, s3, log)
 	h := &Handler{service: svc}
 
 	r.Route("/submissions", func(r chi.Router) {
-		r.Use(authMiddleware.Authenticate(""))
+		r.Use(authMiddleware.Authenticate(jwtSecret))
 		r.Post("/", h.Submit)
 		r.Post("/run", h.Run)
 		r.Get("/{id}", h.GetSubmission)

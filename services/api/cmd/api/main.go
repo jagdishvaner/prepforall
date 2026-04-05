@@ -72,7 +72,7 @@ func main() {
 		auth.RegisterRoutes(r, db, rdb, cfg, log)
 		users.RegisterRoutes(r, db, log)
 		problems.RegisterRoutes(r, db, rdb, s3Client, log)
-		submissions.RegisterRoutes(r, db, rdb, s3Client, log)
+		submissions.RegisterRoutes(r, db, rdb, s3Client, cfg.JWTSecret, log)
 		contests.RegisterRoutes(r, db, rdb, log)
 		leaderboard.RegisterRoutes(r, rdb, log)
 	})
