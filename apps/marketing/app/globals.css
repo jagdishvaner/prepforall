@@ -3,17 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --color-brand-primary: #ff5c35;
-    --color-brand-accent: #ff5c35;
-    --color-brand-dark: #042729;
-    --color-surface-warm: #fcfcfa;
-    --color-surface-cream: #f8f5ee;
-    --color-surface-salmon: #fcded2;
-    --color-text-primary: #1f1f1f;
-    --color-text-secondary: #516f90;
-  }
-
   html {
     scroll-behavior: smooth;
   }

@@ -1,22 +1,18 @@
 import type { Config } from 'tailwindcss';
+import sharedConfig from '@prepforall/tailwind-config';
 
 const config: Config = {
+  presets: [sharedConfig],
   darkMode: ['class'],
   content: [
     './index.html',
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/platform-ui/src/**/*.{js,ts,jsx,tsx}',
+    '../../packages/ui/react/src/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {
       colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        muted: { DEFAULT: 'hsl(var(--muted))', foreground: 'hsl(var(--muted-foreground))' },
-        border: 'hsl(var(--border))',
-        primary: { DEFAULT: 'hsl(var(--primary))', foreground: 'hsl(var(--primary-foreground))' },
-        secondary: { DEFAULT: 'hsl(var(--secondary))', foreground: 'hsl(var(--secondary-foreground))' },
-        destructive: { DEFAULT: 'hsl(var(--destructive))', foreground: 'hsl(var(--destructive-foreground))' },
         card: 'hsl(var(--background))',
         ring: 'hsl(var(--primary))',
       },
@@ -24,11 +20,6 @@ const config: Config = {
         sans: ['Inter', 'sans-serif'],
         heading: ['DM Sans', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
-      },
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
       },
     },
   },

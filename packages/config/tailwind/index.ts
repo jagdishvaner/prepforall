@@ -12,11 +12,21 @@ const config: Partial<Config> = {
       colors: {
         brand: {
           primary: "var(--color-brand-primary)",
+          "primary-hover": "var(--color-brand-primary-hover)",
+          "primary-light": "var(--color-brand-primary-light)",
           accent: "var(--color-brand-accent)",
+          dark: "var(--color-brand-dark)",
+        },
+        text: {
+          primary: "var(--color-text-primary)",
+          secondary: "var(--color-text-secondary)",
         },
         surface: {
           DEFAULT: "var(--color-surface)",
           raised: "var(--color-surface-raised)",
+          warm: "var(--color-surface-warm)",
+          cream: "var(--color-surface-cream)",
+          salmon: "var(--color-surface-salmon)",
           overlay: "var(--color-surface-overlay)",
         },
         neutral: {

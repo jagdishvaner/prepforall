@@ -46,12 +46,9 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+    <div className="flex min-h-screen font-sans">
       {/* Left panel — brand */}
-      <div
-        className="hidden w-[480px] flex-col justify-between p-12 lg:flex"
-        style={{ backgroundColor: '#042729' }}
-      >
+      <div className="hidden w-[480px] flex-col justify-between bg-brand-dark p-12 lg:flex">
         <div>
           <a href="http://localhost:3001" className="flex items-center gap-3">
             <img
@@ -60,76 +57,72 @@ function LoginPage() {
               className="h-10 w-auto brightness-0 invert"
               style={{ clipPath: 'inset(0 0 52% 0)' }}
             />
-            <span className="text-xl font-bold tracking-tight text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <span className="font-heading text-xl font-bold tracking-tight text-white">
               PrepForAll
             </span>
           </a>
           <div className="mt-16">
-            <h2
-              className="text-4xl font-semibold leading-tight tracking-tight text-white"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
+            <h2 className="font-heading text-4xl font-semibold leading-tight tracking-tight text-white">
               Build your coding skills, ace your placements.
             </h2>
-            <p className="mt-6 text-lg leading-relaxed text-gray-400">
+            <p className="mt-6 text-lg leading-relaxed text-neutral-400">
               Practice DSA & SQL problems, take assessments, and track your progress — all in one platform.
             </p>
           </div>
         </div>
 
         <div className="space-y-4">
-          <div className="flex items-center gap-4 rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: 'rgba(255,92,53,0.2)' }}>
-              <svg className="h-5 w-5" style={{ color: '#ff5c35' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="flex items-center gap-4 rounded-xl bg-white/5 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/20">
+              <svg className="h-5 w-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
               </svg>
             </div>
             <div>
               <p className="text-sm font-medium text-white">200+ Problems</p>
-              <p className="text-xs text-gray-500">DSA & SQL with real execution</p>
+              <p className="text-xs text-neutral-500">DSA & SQL with real execution</p>
             </div>
           </div>
-          <div className="flex items-center gap-4 rounded-xl p-4" style={{ backgroundColor: 'rgba(255,255,255,0.05)' }}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ backgroundColor: 'rgba(255,92,53,0.2)' }}>
-              <svg className="h-5 w-5" style={{ color: '#ff5c35' }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <div className="flex items-center gap-4 rounded-xl bg-white/5 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/20">
+              <svg className="h-5 w-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
             <div>
               <p className="text-sm font-medium text-white">Track Progress</p>
-              <p className="text-xs text-gray-500">Analytics & placement insights</p>
+              <p className="text-xs text-neutral-500">Analytics & placement insights</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Right panel — form */}
-      <div className="flex flex-1 items-center justify-center px-6" style={{ backgroundColor: '#fcfcfa' }}>
+      <div className="flex flex-1 items-center justify-center bg-surface-warm px-6">
         <div className="w-full max-w-[420px]">
           {/* Mobile logo */}
           <div className="mb-8 text-center lg:hidden">
-            <h1 className="text-2xl font-bold tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif", color: '#1f1f1f' }}>
-              Prep<span style={{ color: '#ff5c35' }}>ForAll</span>
+            <h1 className="font-heading text-2xl font-bold tracking-tight text-text-primary">
+              Prep<span className="text-brand-primary">ForAll</span>
             </h1>
           </div>
 
           <div className="hidden lg:block">
-            <h1 className="text-3xl font-semibold tracking-tight" style={{ fontFamily: "'DM Sans', sans-serif", color: '#1f1f1f' }}>
+            <h1 className="font-heading text-3xl font-semibold tracking-tight text-text-primary">
               Welcome back
             </h1>
-            <p className="mt-2 text-sm" style={{ color: '#516f90' }}>
+            <p className="mt-2 text-sm text-text-secondary">
               Sign in to continue to your dashboard
             </p>
           </div>
 
           {/* Card */}
-          <div className="mt-8 rounded-2xl border bg-white p-8 shadow-sm" style={{ borderColor: '#e2e8f0' }}>
+          <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
             {/* OAuth buttons */}
             <div className="flex flex-col gap-3">
               <button
                 onClick={() => handleOAuth('google')}
-                className="flex items-center justify-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors hover:bg-gray-50"
-                style={{ borderColor: '#e2e8f0', color: '#1f1f1f' }}
+                className="flex items-center justify-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-sm font-medium text-text-primary transition-colors hover:bg-neutral-50"
               >
                 <svg className="h-5 w-5" viewBox="0 0 24 24">
                   <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
@@ -141,8 +134,7 @@ function LoginPage() {
               </button>
               <button
                 onClick={() => handleOAuth('github')}
-                className="flex items-center justify-center gap-3 rounded-lg border px-4 py-3 text-sm font-medium transition-colors hover:bg-gray-50"
-                style={{ borderColor: '#e2e8f0', color: '#1f1f1f' }}
+                className="flex items-center justify-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-sm font-medium text-text-primary transition-colors hover:bg-neutral-50"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -153,15 +145,15 @@ function LoginPage() {
 
             {/* Divider */}
             <div className="my-6 flex items-center gap-4">
-              <div className="h-px flex-1" style={{ backgroundColor: '#e2e8f0' }} />
-              <span className="text-xs font-medium" style={{ color: '#94a3b8' }}>OR</span>
-              <div className="h-px flex-1" style={{ backgroundColor: '#e2e8f0' }} />
+              <div className="h-px flex-1 bg-neutral-200" />
+              <span className="text-xs font-medium text-neutral-400">OR</span>
+              <div className="h-px flex-1 bg-neutral-200" />
             </div>
 
             {/* Email/password form */}
             <form onSubmit={handleEmailLogin} className="flex flex-col gap-4">
               <div>
-                <label htmlFor="email" className="mb-1.5 block text-sm font-medium" style={{ color: '#1f1f1f' }}>
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text-primary">
                   Email
                 </label>
                 <input
@@ -171,18 +163,15 @@ function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@university.edu"
-                  className="w-full rounded-lg border bg-white px-4 py-3 text-sm transition-all focus:outline-none focus:ring-2"
-                  style={{ borderColor: '#e2e8f0', color: '#1f1f1f' }}
-                  onFocus={(e) => { e.target.style.borderColor = '#ff5c35'; e.target.style.boxShadow = '0 0 0 3px rgba(255,92,53,0.1)'; }}
-                  onBlur={(e) => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
+                  className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-text-primary placeholder:text-neutral-400 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/10"
                 />
               </div>
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
-                  <label htmlFor="password" className="text-sm font-medium" style={{ color: '#1f1f1f' }}>
+                  <label htmlFor="password" className="text-sm font-medium text-text-primary">
                     Password
                   </label>
-                  <a href="/auth/forgot-password" className="text-xs font-medium transition-colors hover:underline" style={{ color: '#ff5c35' }}>
+                  <a href="/auth/forgot-password" className="text-xs font-medium text-brand-primary transition-colors hover:underline">
                     Forgot password?
                   </a>
                 </div>
@@ -194,16 +183,12 @@ function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full rounded-lg border bg-white px-4 py-3 pr-12 text-sm transition-all focus:outline-none focus:ring-2"
-                    style={{ borderColor: '#e2e8f0', color: '#1f1f1f' }}
-                    onFocus={(e) => { e.target.style.borderColor = '#ff5c35'; e.target.style.boxShadow = '0 0 0 3px rgba(255,92,53,0.1)'; }}
-                    onBlur={(e) => { e.target.style.borderColor = '#e2e8f0'; e.target.style.boxShadow = 'none'; }}
+                    className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 pr-12 text-sm text-text-primary placeholder:text-neutral-400 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1"
-                    style={{ color: '#94a3b8' }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-neutral-400"
                     tabIndex={-1}
                   >
                     {showPassword ? (
@@ -222,19 +207,18 @@ function LoginPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="mt-2 rounded-lg px-4 py-3 text-sm font-semibold text-white transition-all hover:brightness-110 disabled:opacity-50"
-                style={{ backgroundColor: '#ff5c35' }}
+                className="mt-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white transition-all hover:brightness-110 disabled:opacity-50"
               >
                 {isSubmitting ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
 
-            <p className="mt-6 text-center text-sm" style={{ color: '#516f90' }}>
+            <p className="mt-6 text-center text-sm text-text-secondary">
               No account? Contact your organization admin for an invite.
             </p>
           </div>
 
-          <p className="mt-6 text-center text-xs" style={{ color: '#94a3b8' }}>
+          <p className="mt-6 text-center text-xs text-neutral-400">
             &copy; 2026 PrepForAll. All rights reserved.
           </p>
         </div>

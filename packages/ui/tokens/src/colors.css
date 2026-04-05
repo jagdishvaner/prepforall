@@ -4,11 +4,16 @@
  */
 :root {
   /* Brand */
-  --color-brand-primary: #2563eb;
-  --color-brand-primary-hover: #1d4ed8;
-  --color-brand-primary-light: #dbeafe;
-  --color-brand-accent: #8b5cf6;
-  --color-brand-accent-hover: #7c3aed;
+  --color-brand-primary: #ff5c35;
+  --color-brand-primary-hover: #e5502f;
+  --color-brand-primary-light: #fcded2;
+  --color-brand-accent: #ff5c35;
+  --color-brand-accent-hover: #e5502f;
+  --color-brand-dark: #042729;
+
+  /* Text */
+  --color-text-primary: #1f1f1f;
+  --color-text-secondary: #516f90;
 
   /* Neutrals */
   --color-neutral-50: #f8fafc;
@@ -26,6 +31,9 @@
   /* Surfaces */
   --color-surface: #ffffff;
   --color-surface-raised: #f8fafc;
+  --color-surface-warm: #fcfcfa;
+  --color-surface-cream: #f8f5ee;
+  --color-surface-salmon: #fcded2;
   --color-surface-overlay: rgba(0, 0, 0, 0.5);
 
   /* Semantic */
