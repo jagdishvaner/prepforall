@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { SetupForm } from '@/features/Auth/SetupForm';
 
 export const Route = createFileRoute('/auth/setup')({
   component: SetupPage,
@@ -9,5 +10,18 @@ export const Route = createFileRoute('/auth/setup')({
 
 function SetupPage() {
   const { token } = Route.useSearch();
-  return <div className="flex h-screen items-center justify-center">Setup page for token: {token}</div>;
+
+  if (!token) {
+    return (
+      <div className="flex h-screen items-center justify-center text-destructive">
+        Invalid or missing invite token.
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+      <SetupForm token={token} />
+    </div>
+  );
 }
