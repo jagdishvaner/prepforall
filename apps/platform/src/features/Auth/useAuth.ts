@@ -5,9 +5,15 @@ import axios from 'axios';
 const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export function useInitAuth() {
-  const { setAuth, clearAuth, setLoading } = useAuthStore();
+  const { setAuth, clearAuth, isAuthenticated, accessToken } = useAuthStore();
 
   useEffect(() => {
+    // Only attempt silent refresh if we don't already have a token in memory
+    // (i.e., on fresh page load, not after a successful login)
+    if (accessToken) {
+      return;
+    }
+
     const tryRefresh = async () => {
       try {
         const { data } = await axios.post(
@@ -22,5 +28,5 @@ export function useInitAuth() {
     };
 
     tryRefresh();
-  }, [setAuth, clearAuth, setLoading]);
+  }, []); // Run once on mount only
 }
