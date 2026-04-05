@@ -17,14 +17,21 @@ const (
 	JudgeGroup       = "judge-workers"
 )
 
+type TestCaseData struct {
+	Input    string `json:"input"`
+	Expected string `json:"expected"`
+}
+
 type SubmissionJob struct {
-	SubmissionID  string `json:"submission_id"`
-	ProblemID     string `json:"problem_id"`
-	UserID        string `json:"user_id"`
-	Language      string `json:"language"`
-	Code          string `json:"code"`
-	TimeLimitMs   int    `json:"time_limit_ms"`
-	MemoryLimitMB int    `json:"memory_limit_mb"`
+	SubmissionID  string         `json:"submission_id"`
+	ProblemID     string         `json:"problem_id"`
+	UserID        string         `json:"user_id"`
+	Language      string         `json:"language"`
+	Code          string         `json:"code"`
+	TimeLimitMs   int            `json:"time_limit_ms"`
+	MemoryLimitMB int            `json:"memory_limit_mb"`
+	Mode          string         `json:"mode"`
+	TestCases     []TestCaseData `json:"test_cases"`
 }
 
 type Worker struct {
@@ -97,15 +104,24 @@ func (w *Worker) process(ctx context.Context, msg redis.XMessage) {
 	w.log.Info("processing submission",
 		zap.String("submissionId", job.SubmissionID),
 		zap.String("language", job.Language),
+		zap.String("mode", job.Mode),
 	)
+
+	// Convert job test cases to runner format
+	testCases := make([]runner.TestCaseInput, len(job.TestCases))
+	for i, tc := range job.TestCases {
+		testCases[i] = runner.TestCaseInput{Input: tc.Input, Expected: tc.Expected}
+	}
 
 	result := w.runner.Execute(ctx, runner.ExecuteRequest{
 		SubmissionID:  job.SubmissionID,
 		ProblemID:     job.ProblemID,
 		Language:      job.Language,
 		Code:          job.Code,
+		TestCases:     testCases,
 		TimeLimitMs:   job.TimeLimitMs,
 		MemoryLimitMB: job.MemoryLimitMB,
+		Mode:          job.Mode,
 	})
 
 	w.publishResult(ctx, result)

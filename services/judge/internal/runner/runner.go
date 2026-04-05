@@ -21,6 +21,7 @@ type ExecuteRequest struct {
 	TestCases     []TestCaseInput
 	TimeLimitMs   int
 	MemoryLimitMB int
+	Mode          string // "run" or "submit"
 }
 
 type TestCaseInput struct {
@@ -28,15 +29,26 @@ type TestCaseInput struct {
 	Expected string
 }
 
+type CaseResult struct {
+	Index          int    `json:"index"`
+	Verdict        string `json:"verdict"`
+	Input          string `json:"input"`
+	ExpectedOutput string `json:"expected_output"`
+	ActualOutput   string `json:"actual_output"`
+	RuntimeMs      int    `json:"runtime_ms"`
+}
+
 type ExecuteResult struct {
-	SubmissionID string `json:"submission_id"`
-	Verdict      string `json:"verdict"`
-	RuntimeMs    int    `json:"runtime_ms"`
-	MemoryKB     int    `json:"memory_kb"`
-	Output       string `json:"output"`
-	ErrorMsg     string `json:"error_msg"`
-	PassedCases  int    `json:"passed_cases"`
-	TotalCases   int    `json:"total_cases"`
+	SubmissionID string       `json:"submission_id"`
+	Verdict      string       `json:"verdict"`
+	RuntimeMs    int          `json:"runtime_ms"`
+	MemoryKB     int          `json:"memory_kb"`
+	Output       string       `json:"output"`
+	ErrorMsg     string       `json:"error_msg"`
+	PassedCases  int          `json:"passed_cases"`
+	TotalCases   int          `json:"total_cases"`
+	Mode         string       `json:"mode,omitempty"`
+	CaseResults  []CaseResult `json:"case_results,omitempty"`
 }
 
 type Runner struct {
@@ -87,23 +99,59 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	result := ExecuteResult{
 		SubmissionID: req.SubmissionID,
 		TotalCases:   len(req.TestCases),
+		Mode:         req.Mode,
 	}
 
-	for _, tc := range req.TestCases {
+	isRunMode := req.Mode == "run"
+	if isRunMode {
+		result.CaseResults = make([]CaseResult, 0, len(req.TestCases))
+	}
+
+	for i, tc := range req.TestCases {
 		verdict, runtimeMs, output, errMsg := r.runTestCase(ctx, sandbox, lang, tc)
 		if runtimeMs > result.RuntimeMs {
 			result.RuntimeMs = runtimeMs
 		}
-		if verdict != VerdictAC {
-			result.Verdict = verdict
-			result.Output = output
-			result.ErrorMsg = errMsg
-			return result
+
+		if isRunMode {
+			result.CaseResults = append(result.CaseResults, CaseResult{
+				Index:          i,
+				Verdict:        verdict,
+				Input:          tc.Input,
+				ExpectedOutput: tc.Expected,
+				ActualOutput:   output,
+				RuntimeMs:      runtimeMs,
+			})
 		}
-		result.PassedCases++
+
+		if verdict == VerdictAC {
+			result.PassedCases++
+		} else {
+			// In submit mode, stop on first failure
+			if !isRunMode {
+				result.Verdict = verdict
+				result.Output = output
+				result.ErrorMsg = errMsg
+				return result
+			}
+		}
 	}
 
-	result.Verdict = VerdictAC
+	if result.PassedCases == result.TotalCases {
+		result.Verdict = VerdictAC
+	} else {
+		// In run mode, set verdict to first non-AC case
+		for _, cr := range result.CaseResults {
+			if cr.Verdict != VerdictAC {
+				result.Verdict = cr.Verdict
+				break
+			}
+		}
+		if result.Verdict == "" {
+			result.Verdict = VerdictWA
+		}
+	}
+
 	return result
 }
 
