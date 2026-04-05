@@ -3,6 +3,10 @@ kind: Kustomization
 
 resources:
   - ../../base
+  # Uncomment after running seal-secret.sh:
+  # - sealed-api-secrets.yaml
+  # - sealed-judge-secrets.yaml
+  # - sealed-grafana-secrets.yaml
 
 patches:
   - path: api-patch.yaml
@@ -14,5 +18,3 @@ patches:
       kind: Deployment
       name: judge
 
-# Sealed secrets are committed separately — see Task 7
-# They are referenced by name in base deployment envFrom
