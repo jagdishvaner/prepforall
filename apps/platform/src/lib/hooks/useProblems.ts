@@ -11,7 +11,7 @@ export interface ProblemsFilter {
 
 export function useProblems(filter: ProblemsFilter = {}) {
   return useQuery({
-    queryKey: queryKeys.problems.list(filter),
+    queryKey: queryKeys.problems.list(filter as Record<string, unknown>),
     queryFn: async () => {
       const { data } = await apiClient.get('/api/v1/problems', { params: filter });
       return data;
