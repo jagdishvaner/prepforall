@@ -4,9 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"os"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"time"
 
@@ -69,41 +67,9 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 		}
 	}
 
-	baseDir := os.Getenv("JUDGE_WORK_DIR")
-	if baseDir == "" {
-		baseDir = os.TempDir()
-	}
-	// Use submission ID as dir name under a pre-existing base dir for consistent Docker bind mounts
-	workDir := filepath.Join(baseDir, req.SubmissionID)
-	if err := os.MkdirAll(workDir, 0755); err != nil {
-		return ExecuteResult{SubmissionID: req.SubmissionID, Verdict: VerdictRE, ErrorMsg: "failed to create work dir"}
-	}
-	defer os.RemoveAll(workDir)
-
-	filename := fmt.Sprintf("solution.%s", lang.FileExt)
-	if req.Language == "java" {
-		filename = "Solution.java"
-	}
-	codeFile := filepath.Join(workDir, filename)
-	if err := os.WriteFile(codeFile, []byte(req.Code), 0644); err != nil {
-		return ExecuteResult{SubmissionID: req.SubmissionID, Verdict: VerdictRE}
-	}
-	// Ensure file is flushed to the shared volume before Docker mounts it
-	if f, err := os.Open(workDir); err == nil {
-		f.Sync()
-		f.Close()
-	}
-
-	if lang.CompileCmd != nil {
-		if ceResult := r.compile(ctx, lang, workDir, req.SubmissionID); ceResult != nil {
-			return *ceResult
-		}
-	}
-
 	sandbox := SandboxConfig{
 		TimeLimitMs:   req.TimeLimitMs,
 		MemoryLimitMB: req.MemoryLimitMB,
-		WorkDir:       workDir,
 	}
 
 	result := ExecuteResult{
@@ -118,7 +84,7 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	}
 
 	for i, tc := range req.TestCases {
-		verdict, runtimeMs, output, errMsg := r.runTestCase(ctx, sandbox, lang, tc)
+		verdict, runtimeMs, output, errMsg := r.runTestCase(ctx, sandbox, lang, req.Code, tc)
 		if runtimeMs > result.RuntimeMs {
 			result.RuntimeMs = runtimeMs
 		}
@@ -137,7 +103,6 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 		if verdict == VerdictAC {
 			result.PassedCases++
 		} else {
-			// In submit mode, stop on first failure
 			if !isRunMode {
 				result.Verdict = verdict
 				result.Output = output
@@ -150,7 +115,6 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	if result.PassedCases == result.TotalCases {
 		result.Verdict = VerdictAC
 	} else {
-		// In run mode, set verdict to first non-AC case
 		for _, cr := range result.CaseResults {
 			if cr.Verdict != VerdictAC {
 				result.Verdict = cr.Verdict
@@ -165,54 +129,46 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	return result
 }
 
-func (r *Runner) compile(ctx context.Context, lang LanguageConfig, workDir, submissionID string) *ExecuteResult {
-	args := lang.CompileCmd
-	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
-	cmd.Dir = workDir
-	var stderr bytes.Buffer
-	cmd.Stderr = &stderr
-
-	if err := cmd.Run(); err != nil {
-		return &ExecuteResult{
-			SubmissionID: submissionID,
-			Verdict:      VerdictCE,
-			ErrorMsg:     stderr.String(),
-		}
-	}
-	return nil
-}
-
-func (r *Runner) runTestCase(ctx context.Context, sandbox SandboxConfig, lang LanguageConfig, tc TestCaseInput) (verdict string, runtimeMs int, output, errMsg string) {
-	// Create container, copy code into it, then start — avoids bind mount issues on Docker Desktop
-	containerName := fmt.Sprintf("judge-%s-%d", filepath.Base(sandbox.WorkDir), time.Now().UnixNano()%100000)
-
-	// Step 1: docker create (without --rm so we can cp into it)
-	createArgs := sandbox.BuildCreateArgs(containerName, lang.Image, lang.RunCmd)
-	createCmd := exec.CommandContext(ctx, "docker", createArgs...)
-	if out, err := createCmd.CombinedOutput(); err != nil {
-		return VerdictRE, 0, "", fmt.Sprintf("docker create failed: %s %s", err, string(out))
-	}
-	// Ensure cleanup
-	defer func() {
-		exec.Command("docker", "rm", "-f", containerName).Run()
-	}()
-
-	// Step 2: docker cp workdir contents into /sandbox/
-	cpCmd := exec.CommandContext(ctx, "docker", "cp", sandbox.WorkDir+"/.", containerName+":/sandbox/")
-	if out, err := cpCmd.CombinedOutput(); err != nil {
-		return VerdictRE, 0, "", fmt.Sprintf("docker cp failed: %s %s", err, string(out))
+// runTestCase executes a single test case by passing the code as an env var into the Docker container.
+// This avoids bind mount issues on Docker Desktop for Mac.
+func (r *Runner) runTestCase(ctx context.Context, sandbox SandboxConfig, lang LanguageConfig, code string, tc TestCaseInput) (verdict string, runtimeMs int, output, errMsg string) {
+	// Build the shell command that writes code to a file and executes it
+	filename := fmt.Sprintf("/tmp/solution.%s", lang.FileExt)
+	if lang.Language == "java" {
+		filename = "/tmp/Solution.java"
 	}
 
-	// Step 3: docker start -i (attach stdin/stdout)
-	startCmd := exec.CommandContext(ctx, "docker", "start", "-i", containerName)
-	startCmd.Stdin = strings.NewReader(tc.Input)
+	var shellCmd string
+	if lang.CompileCmd != nil {
+		// Compiled language: write, compile, run
+		compileCmd := strings.Join(lang.CompileCmd, " ")
+		compileCmd = strings.ReplaceAll(compileCmd, "/sandbox/", "/tmp/")
+		runCmd := strings.Join(lang.RunCmd, " ")
+		runCmd = strings.ReplaceAll(runCmd, "/sandbox/", "/tmp/")
+		shellCmd = fmt.Sprintf(`cat > %s <<'__CODE__'
+%s
+__CODE__
+%s && %s`, filename, code, compileCmd, runCmd)
+	} else {
+		// Interpreted language: write and run
+		runCmd := strings.Join(lang.RunCmd, " ")
+		runCmd = strings.ReplaceAll(runCmd, "/sandbox/", "/tmp/")
+		shellCmd = fmt.Sprintf(`cat > %s <<'__CODE__'
+%s
+__CODE__
+%s`, filename, code, runCmd)
+	}
+
+	dockerArgs := sandbox.BuildDockerArgs(lang.Image, []string{"sh", "-c", shellCmd})
+	cmd := exec.CommandContext(ctx, "docker", dockerArgs...)
+	cmd.Stdin = strings.NewReader(tc.Input)
 
 	var stdout, stderr bytes.Buffer
-	startCmd.Stdout = &stdout
-	startCmd.Stderr = &stderr
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
 
 	start := time.Now()
-	err := startCmd.Run()
+	err := cmd.Run()
 	elapsed := int(time.Since(start).Milliseconds())
 
 	actualOutput := stdout.String()
@@ -220,8 +176,8 @@ func (r *Runner) runTestCase(ctx context.Context, sandbox SandboxConfig, lang La
 
 	if err != nil {
 		exitCode := -1
-		if startCmd.ProcessState != nil {
-			exitCode = startCmd.ProcessState.ExitCode()
+		if cmd.ProcessState != nil {
+			exitCode = cmd.ProcessState.ExitCode()
 		}
 		v := DetermineVerdict(exitCode, stderr.String(), tle, false)
 		return v, elapsed, actualOutput, stderr.String()
