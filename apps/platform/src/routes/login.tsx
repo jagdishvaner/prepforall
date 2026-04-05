@@ -5,7 +5,7 @@ import { apiClient } from '@/lib/apiClient';
 import { openOAuthPopup } from '@/features/Auth/OAuthPopup';
 import { toast } from 'sonner';
 
-export const Route = createFileRoute('/auth/login')({
+export const Route = createFileRoute('/login')({
   component: LoginPage,
 });
 

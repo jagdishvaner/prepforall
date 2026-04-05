@@ -9,7 +9,7 @@ export const Route = createFileRoute('/dashboard/')({
   beforeLoad: () => {
     const { isAuthenticated } = useAuthStore.getState();
     if (!isAuthenticated) {
-      throw redirect({ to: '/auth/login' });
+      throw redirect({ to: '/login' });
     }
   },
   component: DashboardPage,

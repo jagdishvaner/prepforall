@@ -12,7 +12,7 @@ interface RouterContext {
 }
 
 // Routes that should NOT show the sidebar/nav layout
-const publicPaths = ['/auth/login', '/auth/setup', '/auth/forgot-password', '/auth/reset-password', '/auth/oauth-callback'];
+const publicPaths = ['/login', '/auth/setup', '/auth/forgot-password', '/auth/reset-password', '/auth/oauth-callback'];
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,

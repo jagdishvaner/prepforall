@@ -1,11 +1,21 @@
 {
   "extends": "@prepforall/typescript-config/nextjs.json",
   "compilerOptions": {
-    "plugins": [{ "name": "next" }],
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
     "paths": {
-      "@/*": ["./*"],
-      "@content/*": ["./content/*"]
-    }
+      "@/*": [
+        "./*"
+      ],
+      "@content/*": [
+        "./content/*"
+      ]
+    },
+    "allowJs": true,
+    "jsx": "preserve"
   },
   "include": [
     "next-env.d.ts",
@@ -13,5 +23,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

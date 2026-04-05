@@ -1682,6 +1682,7 @@ __metadata:
     "@types/react-dom": "npm:^19"
     autoprefixer: "npm:^10.4.20"
     framer-motion: "npm:^12.0.0"
+    jsdom: "npm:^25.0.0"
     lucide-react: "npm:^0.469.0"
     postcss: "npm:^8"
     tailwindcss: "npm:^3.4.1"
@@ -1727,6 +1728,8 @@ __metadata:
   resolution: "@prepforall/platform-ui@workspace:packages/platform-ui"
   dependencies:
     "@monaco-editor/react": "npm:^4.7.0"
+    "@prepforall/react": "workspace:*"
+    "@prepforall/tokens": "workspace:*"
     "@tanstack/react-table": "npm:^8.21.0"
     "@tanstack/react-virtual": "npm:^3.12.0"
     "@testing-library/jest-dom": "npm:^6.6.0"
