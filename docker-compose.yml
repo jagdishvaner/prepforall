@@ -76,6 +76,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  # Legacy app (remove after migration to marketing + platform)
   web:
     build:
       context: ./apps/web
@@ -89,6 +90,39 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+    profiles:
+      - legacy
+
+  marketing:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.marketing
+    container_name: prepforall_marketing
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    depends_on:
+      - api
+    restart: unless-stopped
+    profiles:
+      - monorepo
+
+  platform:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.platform
+    container_name: prepforall_platform
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8080
+      VITE_WS_URL: ws://localhost:8080
+    depends_on:
+      - api
+    restart: unless-stopped
+    profiles:
+      - monorepo
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -106,7 +140,6 @@ services:
       - "3001:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./infrastructure/observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
     depends_on:
