@@ -23,11 +23,11 @@ interface Props {
 export default async function ProblemsPage({ searchParams }: Props) {
   const params = await searchParams;
   const page = Number(params.page) || 1;
-  const problems = await getProblems({
+  const problems = (await getProblems({
     page,
     difficulty: params.difficulty,
     q: params.q,
-  });
+  })) ?? [];
 
   return (
     <>

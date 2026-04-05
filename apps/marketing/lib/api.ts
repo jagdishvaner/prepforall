@@ -31,7 +31,8 @@ export async function getProblems(params?: {
     });
 
     if (!res.ok) return [];
-    return res.json();
+    const data = await res.json();
+    return Array.isArray(data) ? data : data?.problems ?? data?.data ?? [];
   } catch {
     return [];
   }
@@ -44,7 +45,8 @@ export async function getProblemBySlug(slug: string): Promise<Problem | null> {
     });
 
     if (!res.ok) return null;
-    return res.json();
+    const data = await res.json();
+    return data ?? null;
   } catch {
     return null;
   }
