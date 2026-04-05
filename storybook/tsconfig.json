@@ -1,0 +1,7 @@
+{
+  "extends": "@prepforall/typescript-config/react-library.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["stories/**/*.ts", "stories/**/*.tsx", ".storybook/**/*.ts"]
+}

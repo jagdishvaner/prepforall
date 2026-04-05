@@ -6,7 +6,8 @@
     "apps/*",
     "packages/*",
     "packages/ui/*",
-    "packages/config/*"
+    "packages/config/*",
+    "storybook"
   ],
   "scripts": {
     "build": "turbo run build",
