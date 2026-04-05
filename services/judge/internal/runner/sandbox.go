@@ -41,7 +41,7 @@ func (s SandboxConfig) BuildDockerArgs(image string, runCmd []string) []string {
 	}
 
 	args := []string{
-		"run", "--rm",
+		"run", "--rm", "-i",
 		"--runtime=" + runtime, // gVisor (runsc) in prod, runc for local dev
 		"--network=none",           // no network
 		"--read-only",              // immutable filesystem
