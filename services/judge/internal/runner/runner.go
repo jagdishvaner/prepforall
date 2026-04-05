@@ -73,8 +73,9 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	if baseDir == "" {
 		baseDir = os.TempDir()
 	}
-	workDir, err := os.MkdirTemp(baseDir, "judge-*")
-	if err != nil {
+	// Use submission ID as dir name under a pre-existing base dir for consistent Docker bind mounts
+	workDir := filepath.Join(baseDir, req.SubmissionID)
+	if err := os.MkdirAll(workDir, 0755); err != nil {
 		return ExecuteResult{SubmissionID: req.SubmissionID, Verdict: VerdictRE, ErrorMsg: "failed to create work dir"}
 	}
 	defer os.RemoveAll(workDir)
@@ -86,6 +87,11 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	codeFile := filepath.Join(workDir, filename)
 	if err := os.WriteFile(codeFile, []byte(req.Code), 0644); err != nil {
 		return ExecuteResult{SubmissionID: req.SubmissionID, Verdict: VerdictRE}
+	}
+	// Ensure file is flushed to the shared volume before Docker mounts it
+	if f, err := os.Open(workDir); err == nil {
+		f.Sync()
+		f.Close()
 	}
 
 	if lang.CompileCmd != nil {
@@ -177,23 +183,47 @@ func (r *Runner) compile(ctx context.Context, lang LanguageConfig, workDir, subm
 }
 
 func (r *Runner) runTestCase(ctx context.Context, sandbox SandboxConfig, lang LanguageConfig, tc TestCaseInput) (verdict string, runtimeMs int, output, errMsg string) {
-	dockerArgs := sandbox.BuildDockerArgs(lang.Image, lang.RunCmd)
-	cmd := exec.CommandContext(ctx, "docker", dockerArgs...)
-	cmd.Stdin = strings.NewReader(tc.Input)
+	// Create container, copy code into it, then start — avoids bind mount issues on Docker Desktop
+	containerName := fmt.Sprintf("judge-%s-%d", filepath.Base(sandbox.WorkDir), time.Now().UnixNano()%100000)
+
+	// Step 1: docker create (without --rm so we can cp into it)
+	createArgs := sandbox.BuildCreateArgs(containerName, lang.Image, lang.RunCmd)
+	createCmd := exec.CommandContext(ctx, "docker", createArgs...)
+	if out, err := createCmd.CombinedOutput(); err != nil {
+		return VerdictRE, 0, "", fmt.Sprintf("docker create failed: %s %s", err, string(out))
+	}
+	// Ensure cleanup
+	defer func() {
+		exec.Command("docker", "rm", "-f", containerName).Run()
+	}()
+
+	// Step 2: docker cp workdir contents into /sandbox/
+	cpCmd := exec.CommandContext(ctx, "docker", "cp", sandbox.WorkDir+"/.", containerName+":/sandbox/")
+	if out, err := cpCmd.CombinedOutput(); err != nil {
+		return VerdictRE, 0, "", fmt.Sprintf("docker cp failed: %s %s", err, string(out))
+	}
+
+	// Step 3: docker start -i (attach stdin/stdout)
+	startCmd := exec.CommandContext(ctx, "docker", "start", "-i", containerName)
+	startCmd.Stdin = strings.NewReader(tc.Input)
 
 	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
+	startCmd.Stdout = &stdout
+	startCmd.Stderr = &stderr
 
 	start := time.Now()
-	err := cmd.Run()
+	err := startCmd.Run()
 	elapsed := int(time.Since(start).Milliseconds())
 
 	actualOutput := stdout.String()
 	tle := elapsed >= sandbox.TimeLimitMs
 
 	if err != nil {
-		v := DetermineVerdict(cmd.ProcessState.ExitCode(), stderr.String(), tle, false)
+		exitCode := -1
+		if startCmd.ProcessState != nil {
+			exitCode = startCmd.ProcessState.ExitCode()
+		}
+		v := DetermineVerdict(exitCode, stderr.String(), tle, false)
 		return v, elapsed, actualOutput, stderr.String()
 	}
 
