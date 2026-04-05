@@ -1,7 +1,5 @@
 # ─── Stage 1: Builder ────────────────────────────────────────────────────────
-FROM golang:1.23-alpine AS builder
-
-RUN apk add --no-cache git ca-certificates tzdata
+FROM golang:1.23-bookworm AS builder
 
 WORKDIR /build
 
@@ -11,22 +9,25 @@ RUN go mod download
 
 COPY . .
 
+# Build static binary with optimizations
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -ldflags="-w -s" -o /api ./cmd/api
+    go build -ldflags="-w -s -X main.version=${VERSION:-dev}" -o /api ./cmd/api
 
 # ─── Stage 2: Runtime ────────────────────────────────────────────────────────
-FROM alpine:3.20
+FROM debian:bookworm-slim
 
-RUN apk add --no-cache ca-certificates tzdata wget
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    tzdata \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
 
 # Non-root user for security
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 WORKDIR /app
 
 COPY --from=builder /api .
-
-# Copy config defaults (env vars override in production)
 COPY config/ ./config/
 
 USER appuser
