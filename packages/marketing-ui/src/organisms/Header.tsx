@@ -42,13 +42,17 @@ export function Header({
       }`}
     >
       <div className="mx-auto flex h-20 max-w-[1080px] items-center justify-between px-6">
-        <a href="/" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-3">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoSrc}
             alt="PrepForAll"
-            className="h-10 w-auto"
+            className="h-10 w-auto object-cover object-top"
+            style={{ objectPosition: "top", clipPath: "inset(0 0 52% 0)" }}
           />
+          <span className="text-xl font-bold tracking-tight text-text-primary">
+            Prep<span className="text-brand-primary">ForAll</span>
+          </span>
         </a>
 
         {/* Desktop nav */}

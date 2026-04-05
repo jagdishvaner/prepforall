@@ -33,11 +33,17 @@ export function Footer({
         <div className="grid gap-12 md:grid-cols-5">
           {/* Brand column */}
           <div className="md:col-span-2">
-            <img
-              src={logoSrc}
-              alt="PrepForAll"
-              className="h-10 w-auto brightness-0 invert"
-            />
+            <div className="flex items-center gap-3">
+              <img
+                src={logoSrc}
+                alt="PrepForAll"
+                className="h-10 w-auto object-cover object-top brightness-0 invert"
+                style={{ clipPath: "inset(0 0 52% 0)" }}
+              />
+              <span className="text-xl font-bold tracking-tight text-white">
+                PrepForAll
+              </span>
+            </div>
             <p className="mt-5 max-w-xs text-[15px] leading-relaxed text-gray-400">
               {tagline}
             </p>
