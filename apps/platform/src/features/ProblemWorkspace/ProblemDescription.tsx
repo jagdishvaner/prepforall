@@ -1,3 +1,5 @@
+import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/cn';
 
 const difficultyColors: Record<string, string> = {
@@ -35,7 +37,7 @@ export function ProblemDescription({
           >
             {difficulty}
           </span>
-          {acceptanceRate != null && (
+          {acceptanceRate != null && acceptanceRate > 0 && (
             <span className="text-sm text-muted-foreground">
               Acceptance: {acceptanceRate.toFixed(1)}%
             </span>
@@ -63,8 +65,9 @@ export function ProblemDescription({
                      prose-pre:bg-muted prose-pre:text-foreground
                      prose-code:before:content-none prose-code:after:content-none
                      prose-code:bg-muted prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm"
-          dangerouslySetInnerHTML={{ __html: description }}
-        />
+        >
+          <Markdown remarkPlugins={[remarkGfm]}>{description}</Markdown>
+        </div>
       </div>
     </div>
   );
