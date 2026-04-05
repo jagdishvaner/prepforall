@@ -1,15 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createSubmissionSocket } from '../ws';
-
-interface SubmissionResult {
-  id: string;
-  verdict: string;
-  runtimeMs?: number;
-  memoryKb?: number;
-  passedCases: number;
-  totalCases: number;
-  errorMsg?: string;
-}
+import type { SubmissionResult } from '@/features/ProblemWorkspace/TestCasePanel';
 
 export function useSubmissionResult(submissionId: string | null) {
   const [result, setResult] = useState<SubmissionResult | null>(null);

@@ -1,48 +1,111 @@
+import { useState, useEffect, useCallback } from 'react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { CodeEditor } from '@prepforall/platform-ui/organisms';
-import { SubmissionPanel } from '@prepforall/platform-ui/organisms';
-import { useEditorStore } from '@/stores/editorStore';
+import { useEditorStore, DEFAULT_STARTER_CODE } from '@/stores/editorStore';
 import { useProblem } from '@/lib/hooks/useProblems';
+import { useTestCases } from '@/lib/hooks/useTestCases';
+import { useSubmission } from '@/lib/hooks/useSubmission';
+import { ProblemDescription } from './ProblemDescription';
 import { EditorToolbar } from './EditorToolbar';
-import { toast } from 'sonner';
+import { EditorStatusBar } from './EditorStatusBar';
+import { TestCasePanel } from './TestCasePanel';
 
-interface Props { slug: string; }
+interface Props {
+  slug: string;
+}
 
 export function ProblemWorkspace({ slug }: Props) {
   const { data: problem, isLoading } = useProblem(slug);
+  const { data: testCases = [] } = useTestCases(slug);
   const { language, theme, fontSize, tabSize, getCode, setCode } = useEditorStore();
-  const code = getCode(slug, language);
+  const { run, submit, result, isJudging, mode } = useSubmission(slug);
+  const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Load starter code if no saved code exists (prefer problem-specific, fallback to generic)
+  let code = getCode(slug, language);
+  if (!code) {
+    const starter = problem?.starterCode?.[language] ?? DEFAULT_STARTER_CODE[language] ?? '';
+    if (starter) {
+      code = starter;
+      setCode(slug, language, code);
+    }
+  }
+
+  const handleRun = useCallback(() => {
+    run(getCode(slug, language), language);
+  }, [run, getCode, slug, language]);
+
+  const handleSubmit = useCallback(() => {
+    submit(getCode(slug, language), language);
+  }, [submit, getCode, slug, language]);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const mod = e.metaKey || e.ctrlKey;
+      if (mod && e.key === 'Enter' && e.shiftKey) {
+        e.preventDefault();
+        handleSubmit();
+      } else if (mod && e.key === 'Enter') {
+        e.preventDefault();
+        handleRun();
+      } else if (mod && e.key === 's') {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [handleRun, handleSubmit]);
 
   if (isLoading) {
-    return <div className="flex h-full items-center justify-center text-muted-foreground">Loading problem...</div>;
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+        Loading problem...
+      </div>
+    );
   }
 
   if (!problem) {
-    return <div className="flex h-full items-center justify-center text-destructive">Problem not found.</div>;
+    return (
+      <div className="flex h-full items-center justify-center text-destructive">
+        Problem not found.
+      </div>
+    );
   }
 
   return (
     <PanelGroup direction="horizontal" className="h-full">
-      <Panel defaultSize={40} minSize={25}>
-        <div className="h-full overflow-y-auto p-6 prose prose-sm dark:prose-invert max-w-none">
-          <h1>{problem.title}</h1>
-          <div dangerouslySetInnerHTML={{ __html: problem.description ?? '' }} />
-        </div>
-      </Panel>
+      {/* Left: Problem description */}
+      {!isFullscreen && (
+        <>
+          <Panel defaultSize={40} minSize={25}>
+            <ProblemDescription
+              title={problem.title}
+              difficulty={problem.difficulty ?? 'easy'}
+              tags={problem.tags ?? []}
+              acceptanceRate={problem.acceptanceRate}
+              description={problem.description ?? ''}
+            />
+          </Panel>
+          <PanelResizeHandle className="w-1 bg-border hover:bg-primary/50 transition-colors" />
+        </>
+      )}
 
-      <PanelResizeHandle className="w-1 bg-border hover:bg-primary/50 transition-colors" />
-
-      <Panel defaultSize={60} minSize={30}>
+      {/* Right: Editor + Test cases */}
+      <Panel defaultSize={isFullscreen ? 100 : 60} minSize={30}>
         <PanelGroup direction="vertical">
+          {/* Editor */}
           <Panel defaultSize={65} minSize={30}>
             <div className="flex h-full flex-col">
               <EditorToolbar
                 slug={slug}
-                isJudging={false}
-                isFullscreen={false}
-                onRun={() => toast.info('Run: coming in Sub-project 2')}
-                onSubmit={() => toast.info('Submit: coming in Sub-project 2')}
-                onToggleFullscreen={() => {}}
+                starterCode={problem.starterCode}
+                isJudging={isJudging}
+                isFullscreen={isFullscreen}
+                onRun={handleRun}
+                onSubmit={handleSubmit}
+                onToggleFullscreen={() => setIsFullscreen(!isFullscreen)}
               />
               <div className="flex-1 overflow-hidden">
                 <CodeEditor
@@ -52,15 +115,23 @@ export function ProblemWorkspace({ slug }: Props) {
                   fontSize={fontSize}
                   tabSize={tabSize}
                   onChange={(val) => setCode(slug, language, val ?? '')}
+                  onCursorChange={(line, col) => setCursorPos({ line, col })}
                 />
               </div>
+              <EditorStatusBar line={cursorPos.line} column={cursorPos.col} />
             </div>
           </Panel>
 
           <PanelResizeHandle className="h-1 bg-border hover:bg-primary/50 transition-colors" />
 
+          {/* Test Cases / Results */}
           <Panel defaultSize={35} minSize={15}>
-            <SubmissionPanel result={null} isJudging={false} testCases={[]} />
+            <TestCasePanel
+              testCases={testCases}
+              result={result}
+              isJudging={isJudging}
+              mode={mode}
+            />
           </Panel>
         </PanelGroup>
       </Panel>

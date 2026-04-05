@@ -8,24 +8,33 @@ export interface SubmitRequest {
 
 export interface Submission {
   id: string;
-  problemSlug: string;
+  user_id: string;
+  problem_id: string;
   language: string;
   verdict: string;
-  runtimeMs?: number;
-  memoryKb?: number;
-  passedCases: number;
-  totalCases: number;
-  errorMsg?: string;
-  createdAt: string;
+  runtime_ms?: number;
+  memory_kb?: number;
+  passed_cases: number;
+  total_cases: number;
+  error_msg?: string;
+  created_at: string;
 }
 
 export const submissionsApi = {
   submit: async (req: SubmitRequest) => {
-    const { data } = await apiClient.post<{ submission_id: string }>('/api/v1/submissions', req);
+    const { data } = await apiClient.post<Submission>('/api/v1/submissions', {
+      problem_slug: req.problemSlug,
+      language: req.language,
+      code: req.code,
+    });
     return data;
   },
   run: async (req: SubmitRequest) => {
-    const { data } = await apiClient.post('/api/v1/submissions/run', req);
+    const { data } = await apiClient.post<{ run_id: string }>('/api/v1/submissions/run', {
+      problem_slug: req.problemSlug,
+      language: req.language,
+      code: req.code,
+    });
     return data;
   },
   getByProblem: async (slug: string) => {
