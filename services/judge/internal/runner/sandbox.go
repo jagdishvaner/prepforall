@@ -34,14 +34,14 @@ func (s SandboxConfig) BuildDockerArgs(image string, runCmd []string) []string {
 		"--runtime=" + runtime, // gVisor (runsc) in prod, runc for local dev
 		"--network=none",           // no network
 		"--read-only",              // immutable filesystem
-		"--tmpfs", "/sandbox:size=64m", // writable temp dir
+		"--tmpfs", "/tmp:size=64m", // writable temp dir
 		"--memory", memoryLimit,
 		"--memory-swap", memoryLimit, // disable swap
 		"--cpus", "0.5",
 		"--pids-limit", "50",
 		"--cap-drop", "ALL",
 		"--security-opt", "no-new-privileges",
-		"-v", fmt.Sprintf("%s:/sandbox/solution:ro", s.WorkDir),
+		"-v", fmt.Sprintf("%s:/sandbox:ro", s.WorkDir),
 		image,
 		"timeout", timeoutSecs,
 	}

@@ -93,7 +93,7 @@ func (r *Runner) Execute(ctx context.Context, req ExecuteRequest) ExecuteResult 
 	sandbox := SandboxConfig{
 		TimeLimitMs:   req.TimeLimitMs,
 		MemoryLimitMB: req.MemoryLimitMB,
-		WorkDir:       codeFile,
+		WorkDir:       workDir,
 	}
 
 	result := ExecuteResult{
