@@ -1,0 +1,99 @@
+name: Frontend CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/marketing/**"
+      - "apps/platform/**"
+      - "packages/**"
+      - "turbo.json"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/ci-frontend.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/marketing/**"
+      - "apps/platform/**"
+      - "packages/**"
+      - "turbo.json"
+      - "package.json"
+      - "yarn.lock"
+      - ".github/workflows/ci-frontend.yaml"
+
+concurrency:
+  group: ci-frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Turbo lint
+        run: yarn turbo lint
+
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Turbo type check
+        run: yarn turbo typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Turbo test
+        run: yarn turbo test:ci
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Turbo build
+        run: yarn turbo build
+      - name: Upload marketing build
+        uses: actions/upload-artifact@v4
+        with:
+          name: marketing-build
+          path: apps/marketing/.next
+          retention-days: 1
+          if-no-files-found: ignore
+      - name: Upload platform build
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-build
+          path: apps/platform/dist
+          retention-days: 1
+          if-no-files-found: ignore
