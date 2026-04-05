@@ -8,6 +8,7 @@ on:
       - "packages/ui/**"
       - "packages/marketing-ui/**"
       - "packages/shared/**"
+      - "packages/config/**"
   pull_request:
     branches: [main]
     paths:
@@ -15,6 +16,7 @@ on:
       - "packages/ui/**"
       - "packages/marketing-ui/**"
       - "packages/shared/**"
+      - "packages/config/**"
   workflow_dispatch:
     inputs:
       environment:
@@ -47,6 +49,7 @@ jobs:
               - 'packages/ui/**'
               - 'packages/marketing-ui/**'
               - 'packages/shared/**'
+              - 'packages/config/**'
 
   build:
     name: Build Marketing

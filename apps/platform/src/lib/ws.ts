@@ -1,3 +1,5 @@
+import { useAuthStore } from '../stores/authStore';
+
 const WS_BASE = import.meta.env.VITE_WS_URL || `ws://${window.location.host}`;
 
 export function createSubmissionSocket(
@@ -5,7 +7,8 @@ export function createSubmissionSocket(
   onMessage: (data: unknown) => void,
   onError?: (err: Event) => void
 ): () => void {
-  const ws = new WebSocket(`${WS_BASE}/ws?submission_id=${submissionId}`);
+  const token = useAuthStore.getState().accessToken;
+  const ws = new WebSocket(`${WS_BASE}/ws?submission_id=${submissionId}&token=${encodeURIComponent(token || '')}`);
 
   ws.onmessage = (event) => {
     try {
