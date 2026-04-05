@@ -1,0 +1,28 @@
+{
+  "items": [
+    {
+      "question": "How does pricing work?",
+      "answer": "We offer institution-level pricing based on student count. Contact us for a custom quote tailored to your needs."
+    },
+    {
+      "question": "Can students sign up individually?",
+      "answer": "No. PrepForAll is B2B only. Students get access through their university or training partner."
+    },
+    {
+      "question": "What programming languages are supported?",
+      "answer": "We support C++, C, Java, Python 3, JavaScript, and Go for DSA problems, plus SQL for database problems."
+    },
+    {
+      "question": "How is code execution secured?",
+      "answer": "Every submission runs in a gVisor-sandboxed Docker container with zero network access and hard resource limits."
+    },
+    {
+      "question": "Do you provide reports for NAAC/NIRF?",
+      "answer": "Yes. Growth and Enterprise plans include exportable analytics reports formatted for accreditation bodies."
+    },
+    {
+      "question": "What does onboarding look like?",
+      "answer": "We provide a dedicated onboarding session for trainers, help set up batches, and provide ongoing support."
+    }
+  ]
+}

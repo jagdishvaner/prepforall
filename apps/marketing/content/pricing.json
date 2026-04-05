@@ -1,0 +1,54 @@
+{
+  "heading": "Simple, transparent pricing for institutions",
+  "subtitle": "All plans include trainer onboarding, co-branded certificates, and exportable reports.",
+  "tiers": [
+    {
+      "tier": "Starter",
+      "description": "Up to 100 students",
+      "features": [
+        "Full problem library (200+ DSA & SQL)",
+        "Up to 3 trainer accounts",
+        "Batch management",
+        "Basic analytics",
+        "Email support",
+        "Trainer onboarding session"
+      ],
+      "ctaLabel": "Contact for Quote",
+      "ctaHref": "/contact",
+      "popular": false
+    },
+    {
+      "tier": "Growth",
+      "description": "Up to 500 students",
+      "features": [
+        "Everything in Starter",
+        "Unlimited trainer accounts",
+        "Advanced analytics & reports",
+        "Custom test templates",
+        "NAAC/NIRF export reports",
+        "Priority support",
+        "Co-branded certificates"
+      ],
+      "ctaLabel": "Contact for Quote",
+      "ctaHref": "/contact",
+      "popular": true
+    },
+    {
+      "tier": "Enterprise",
+      "description": "Unlimited students",
+      "features": [
+        "Everything in Growth",
+        "Dedicated account manager",
+        "Custom problem sets",
+        "API access",
+        "SLA guarantee",
+        "White-label option",
+        "On-site training workshops"
+      ],
+      "ctaLabel": "Contact for Quote",
+      "ctaHref": "/contact",
+      "popular": false
+    }
+  ],
+  "faqRef": "faq.json"
+}

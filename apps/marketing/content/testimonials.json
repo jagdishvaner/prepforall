@@ -1,0 +1,26 @@
+{
+  "heading": "What our partners say",
+  "testimonials": [
+    {
+      "quote": "PrepForAll transformed how we deliver coding training. The analytics alone justified the partnership.",
+      "name": "Dr. Priya Sharma",
+      "role": "Head of Training",
+      "institution": "Vikash Tech Solution",
+      "photoUrl": "/images/testimonials/priya.jpg"
+    },
+    {
+      "quote": "Our students' placement rates jumped 30% in the first semester. The LeetCode-style practice was exactly what they needed.",
+      "name": "Prof. Rajesh Kumar",
+      "role": "Placement Coordinator",
+      "institution": "SRM University",
+      "photoUrl": "/images/testimonials/rajesh.jpg"
+    },
+    {
+      "quote": "The batch management and test assignment features save us hours every week. It's like having an extra team member.",
+      "name": "Ananya Iyer",
+      "role": "Senior Trainer",
+      "institution": "SpleN Technologies",
+      "photoUrl": "/images/testimonials/ananya.jpg"
+    }
+  ]
+}
