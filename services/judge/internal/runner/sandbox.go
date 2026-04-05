@@ -3,6 +3,7 @@ package runner
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 // SandboxConfig builds the Docker run arguments enforcing strict resource isolation.
@@ -17,7 +18,17 @@ import (
 type SandboxConfig struct {
 	TimeLimitMs   int
 	MemoryLimitMB int
-	WorkDir       string
+	WorkDir       string // path inside the shared volume (e.g., /judge-work/judge-xxx)
+}
+
+// volumeName returns the Docker volume name for the judge work directory.
+// In docker-compose, volumes are prefixed with the project name.
+func volumeName() string {
+	name := os.Getenv("JUDGE_VOLUME_NAME")
+	if name == "" {
+		name = "prepforall_judge-work"
+	}
+	return name
 }
 
 func (s SandboxConfig) BuildDockerArgs(image string, runCmd []string) []string {
@@ -41,10 +52,16 @@ func (s SandboxConfig) BuildDockerArgs(image string, runCmd []string) []string {
 		"--pids-limit", "50",
 		"--cap-drop", "ALL",
 		"--security-opt", "no-new-privileges",
-		"-v", fmt.Sprintf("%s:/sandbox:ro", s.WorkDir),
+		"--mount", fmt.Sprintf("type=volume,source=%s,target=/judge-work,readonly", volumeName()),
 		image,
 		"timeout", timeoutSecs,
 	}
 
-	return append(args, runCmd...)
+	// Rewrite /sandbox references in runCmd to the actual work directory
+	rewritten := make([]string, len(runCmd))
+	for i, arg := range runCmd {
+		rewritten[i] = strings.ReplaceAll(arg, "/sandbox", s.WorkDir)
+	}
+
+	return append(args, rewritten...)
 }
