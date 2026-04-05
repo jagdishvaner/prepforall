@@ -7,10 +7,9 @@ import { SuperAdminDashboard } from '@/features/Dashboard/SuperAdminDashboard';
 
 export const Route = createFileRoute('/dashboard/')({
   beforeLoad: () => {
-    const { isAuthenticated, setLoginModalOpen } = useAuthStore.getState();
+    const { isAuthenticated } = useAuthStore.getState();
     if (!isAuthenticated) {
-      setLoginModalOpen(true);
-      throw redirect({ to: '/' });
+      throw redirect({ to: '/auth/login' });
     }
   },
   component: DashboardPage,

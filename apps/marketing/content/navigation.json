@@ -6,7 +6,7 @@
       { "label": "Features", "href": "/features" },
       { "label": "For Universities", "href": "/for-universities" }
     ],
-    "loginHref": "http://localhost:5173",
+    "loginHref": "http://localhost:5173/auth/login",
     "ctaLabel": "Request Demo",
     "ctaHref": "/for-universities"
   },
