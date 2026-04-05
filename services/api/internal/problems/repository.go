@@ -53,19 +53,22 @@ func (r *Repository) List(ctx context.Context, f ListFilter) ([]*Problem, error)
 
 func (r *Repository) FindBySlug(ctx context.Context, slug string) (*Problem, error) {
 	var p Problem
+	var sc StarterCodeJSON
 	err := r.db.QueryRow(ctx,
 		`SELECT id, slug, title, description, difficulty, tags, time_limit_ms,
-		        memory_limit_mb, acceptance_rate, total_submissions, is_public, created_at
+		        memory_limit_mb, acceptance_rate, total_submissions, is_public, starter_code, created_at
 		 FROM problems WHERE slug = $1 AND is_public = true`, slug,
 	).Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Difficulty, &p.Tags,
 		&p.TimeLimitMs, &p.MemoryLimitMB, &p.AcceptanceRate, &p.TotalSubmissions,
-		&p.IsPublic, &p.CreatedAt)
+		&p.IsPublic, &sc, &p.CreatedAt)
+	p.StarterCode = sc
 	return &p, err
 }
 
 func (r *Repository) FindSampleTestCases(ctx context.Context, slug string) ([]*TestCase, error) {
 	rows, err := r.db.Query(ctx,
-		`SELECT tc.id, tc.problem_id, tc.s3_input_key, tc.s3_output_key, tc.display_order
+		`SELECT tc.id, tc.problem_id, tc.s3_input_key, tc.s3_output_key, tc.display_order,
+		        COALESCE(tc.input_content, ''), COALESCE(tc.output_content, '')
 		 FROM test_cases tc
 		 JOIN problems p ON p.id = tc.problem_id
 		 WHERE p.slug = $1 AND tc.is_sample = true
@@ -80,7 +83,7 @@ func (r *Repository) FindSampleTestCases(ctx context.Context, slug string) ([]*T
 	for rows.Next() {
 		var tc TestCase
 		tc.IsSample = true
-		rows.Scan(&tc.ID, &tc.ProblemID, &tc.Input, &tc.Output, &tc.Order)
+		rows.Scan(&tc.ID, &tc.ProblemID, &tc.Input, &tc.Output, &tc.Order, &tc.InputContent, &tc.OutputContent)
 		cases = append(cases, &tc)
 	}
 	return cases, nil
@@ -88,7 +91,8 @@ func (r *Repository) FindSampleTestCases(ctx context.Context, slug string) ([]*T
 
 func (r *Repository) FindAllTestCases(ctx context.Context, problemID string) ([]*TestCase, error) {
 	rows, err := r.db.Query(ctx,
-		`SELECT tc.id, tc.problem_id, tc.s3_input_key, tc.s3_output_key, tc.is_sample, tc.display_order
+		`SELECT tc.id, tc.problem_id, tc.s3_input_key, tc.s3_output_key, tc.is_sample, tc.display_order,
+		        COALESCE(tc.input_content, ''), COALESCE(tc.output_content, '')
 		 FROM test_cases tc
 		 WHERE tc.problem_id = $1
 		 ORDER BY tc.display_order`, problemID,
@@ -101,7 +105,7 @@ func (r *Repository) FindAllTestCases(ctx context.Context, problemID string) ([]
 	var cases []*TestCase
 	for rows.Next() {
 		var tc TestCase
-		if err := rows.Scan(&tc.ID, &tc.ProblemID, &tc.Input, &tc.Output, &tc.IsSample, &tc.Order); err != nil {
+		if err := rows.Scan(&tc.ID, &tc.ProblemID, &tc.Input, &tc.Output, &tc.IsSample, &tc.Order, &tc.InputContent, &tc.OutputContent); err != nil {
 			return nil, fmt.Errorf("scan test case: %w", err)
 		}
 		cases = append(cases, &tc)

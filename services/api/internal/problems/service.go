@@ -73,10 +73,20 @@ func (s *Service) GetSampleTestCases(ctx context.Context, slug string) ([]*TestC
 	}
 
 	for _, tc := range cases {
-		inputData, _ := s.s3.GetObject(ctx, tc.Input)
-		outputData, _ := s.s3.GetObject(ctx, tc.Output)
-		tc.Input = string(inputData)
-		tc.Output = string(outputData)
+		if tc.Input != "" {
+			// S3 key present — fetch from object storage
+			inputData, _ := s.s3.GetObject(ctx, tc.Input)
+			tc.Input = string(inputData)
+		} else {
+			// Use inline content from DB
+			tc.Input = tc.InputContent
+		}
+		if tc.Output != "" {
+			outputData, _ := s.s3.GetObject(ctx, tc.Output)
+			tc.Output = string(outputData)
+		} else {
+			tc.Output = tc.OutputContent
+		}
 	}
 
 	if data, err := json.Marshal(cases); err == nil {

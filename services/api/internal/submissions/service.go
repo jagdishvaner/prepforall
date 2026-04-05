@@ -124,17 +124,29 @@ func (s *Service) fetchSampleTestCases(ctx context.Context, slug string) ([]queu
 func (s *Service) resolveTestCaseContent(ctx context.Context, cases []*problems.TestCase) ([]queue.TestCaseData, error) {
 	result := make([]queue.TestCaseData, 0, len(cases))
 	for _, tc := range cases {
-		inputData, err := s.s3.GetObject(ctx, tc.Input)
-		if err != nil {
-			return nil, err
+		var input, expected string
+		if tc.Input != "" {
+			// S3 key present — fetch from object storage
+			data, err := s.s3.GetObject(ctx, tc.Input)
+			if err != nil {
+				return nil, err
+			}
+			input = string(data)
+		} else {
+			input = tc.InputContent
 		}
-		outputData, err := s.s3.GetObject(ctx, tc.Output)
-		if err != nil {
-			return nil, err
+		if tc.Output != "" {
+			data, err := s.s3.GetObject(ctx, tc.Output)
+			if err != nil {
+				return nil, err
+			}
+			expected = string(data)
+		} else {
+			expected = tc.OutputContent
 		}
 		result = append(result, queue.TestCaseData{
-			Input:    string(inputData),
-			Expected: string(outputData),
+			Input:    input,
+			Expected: expected,
 		})
 	}
 	return result, nil
