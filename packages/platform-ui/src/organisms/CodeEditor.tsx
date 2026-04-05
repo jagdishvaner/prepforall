@@ -15,13 +15,14 @@ export interface CodeEditorProps {
   readOnly?: boolean;
   onChange?: OnChange;
   onMount?: OnMount;
+  onCursorChange?: (line: number, column: number) => void;
   className?: string;
   height?: string;
 }
 
 export function CodeEditor({
   value, language, theme = 'vs-dark', fontSize = 14, tabSize = 4,
-  readOnly = false, onChange, onMount, className, height = '100%',
+  readOnly = false, onChange, onMount, onCursorChange, className, height = '100%',
 }: CodeEditorProps) {
   return (
     <div className={cn('h-full w-full overflow-hidden', className)}>
@@ -31,7 +32,14 @@ export function CodeEditor({
         value={value}
         theme={theme}
         onChange={onChange}
-        onMount={onMount}
+        onMount={(editor) => {
+          onMount?.(editor, undefined as any);
+          if (onCursorChange) {
+            editor.onDidChangeCursorPosition((e) => {
+              onCursorChange(e.position.lineNumber, e.position.column);
+            });
+          }
+        }}
         options={{
           fontSize, tabSize, readOnly,
           minimap: { enabled: false },

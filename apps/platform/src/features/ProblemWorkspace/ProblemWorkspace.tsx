@@ -38,8 +38,11 @@ export function ProblemWorkspace({ slug }: Props) {
             <div className="flex h-full flex-col">
               <EditorToolbar
                 slug={slug}
+                isJudging={false}
+                isFullscreen={false}
                 onRun={() => toast.info('Run: coming in Sub-project 2')}
                 onSubmit={() => toast.info('Submit: coming in Sub-project 2')}
+                onToggleFullscreen={() => {}}
               />
               <div className="flex-1 overflow-hidden">
                 <CodeEditor
