@@ -1,0 +1,26 @@
+{
+  "name": "prepforall",
+  "private": true,
+  "packageManager": "yarn@4.13.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "packages/ui/*",
+    "packages/config/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "build:css": "turbo run build:css",
+    "build:react": "turbo run build:react",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:ci": "turbo run test:ci",
+    "type-check": "turbo run type-check",
+    "storybook": "turbo run storybook --filter=storybook",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.4.0"
+  }
+}
