@@ -16,7 +16,8 @@ interface Props {
 
 export function ProblemWorkspace({ slug }: Props) {
   const { data: problem, isLoading } = useProblem(slug);
-  const { data: testCases = [] } = useTestCases(slug);
+  const { data: rawTestCases } = useTestCases(slug);
+  const testCases = rawTestCases ?? [];
   const { language, theme, fontSize, tabSize, getCode, setCode } = useEditorStore();
   const { run, submit, result, isJudging, mode } = useSubmission(slug);
   const [cursorPos, setCursorPos] = useState({ line: 1, col: 1 });

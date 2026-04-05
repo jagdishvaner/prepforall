@@ -43,7 +43,7 @@ export function ProblemDescription({
         </div>
 
         {/* Tags */}
-        {tags.length > 0 && (
+        {tags?.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4" role="list" aria-label="Problem tags">
             {tags.map((tag) => (
               <span
