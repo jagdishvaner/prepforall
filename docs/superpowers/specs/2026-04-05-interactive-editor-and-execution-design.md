@@ -1,7 +1,7 @@
 # Interactive Editor & End-to-End Code Execution
 
 **Date:** 2026-04-05
-**Status:** Draft
+**Status:** Implemented
 **Scope:** Editor UI polish (LeetCode-like) + Sub-project 2 (Run/Submit execution flow)
 
 ---
