@@ -32,6 +32,7 @@ type OAuthProviderConfig struct {
 type Service struct {
 	repo          *Repository
 	rdb           *redis.Client
+	httpClient    *http.Client
 	jwtSecret     string
 	accessExpiry  time.Duration
 	refreshExpiry time.Duration
@@ -80,6 +81,7 @@ func NewService(repo *Repository, rdb *redis.Client, cfg *config.Config, log *za
 	return &Service{
 		repo:          repo,
 		rdb:           rdb,
+		httpClient:    &http.Client{Timeout: 10 * time.Second},
 		jwtSecret:     cfg.JWTSecret,
 		accessExpiry:  accessExpiry,
 		refreshExpiry: refreshExpiry,
@@ -418,7 +420,7 @@ func (s *Service) exchangeOAuthCode(provider *OAuthProviderConfig, code string) 
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		s.log.Error("token exchange failed", zap.Error(err))
 		return "", &errors.AppError{Code: 400, Message: "failed to exchange OAuth code"}
@@ -459,7 +461,7 @@ func (s *Service) getGoogleUserInfo(ctx context.Context, code string) (*OAuthUse
 	}
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		s.log.Error("failed to get google user info", zap.Error(err))
 		return nil, errors.ErrInternal
@@ -507,7 +509,7 @@ func (s *Service) getGithubUserInfo(ctx context.Context, code string) (*OAuthUse
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	req.Header.Set("Accept", "application/json")
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := s.httpClient.Do(req)
 	if err != nil {
 		s.log.Error("failed to get github user info", zap.Error(err))
 		return nil, errors.ErrInternal
