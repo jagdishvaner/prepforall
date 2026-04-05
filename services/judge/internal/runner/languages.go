@@ -33,8 +33,8 @@ var Languages = map[string]LanguageConfig{
 	"java": {
 		Language:   "java",
 		Image:      "prepforall/sandbox-java:latest",
-		CompileCmd: []string{"javac", "/sandbox/Solution.java"},
-		RunCmd:     []string{"java", "-cp", "/sandbox", "Solution"},
+		CompileCmd: []string{"javac", "-d", "/tmp", "/sandbox/Solution.java"},
+		RunCmd:     []string{"java", "-cp", "/tmp", "Solution"},
 		FileExt:    "java",
 	},
 	"javascript": {
