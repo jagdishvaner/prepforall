@@ -1,6 +1,9 @@
 package runner
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 // SandboxConfig builds the Docker run arguments enforcing strict resource isolation.
 // Security layers:
@@ -21,9 +24,14 @@ func (s SandboxConfig) BuildDockerArgs(image string, runCmd []string) []string {
 	timeoutSecs := fmt.Sprintf("%ds", s.TimeLimitMs/1000+1)
 	memoryLimit := fmt.Sprintf("%dm", s.MemoryLimitMB)
 
+	runtime := os.Getenv("SANDBOX_RUNTIME")
+	if runtime == "" {
+		runtime = "runsc" // default to gVisor in production
+	}
+
 	args := []string{
 		"run", "--rm",
-		"--runtime=runsc",          // gVisor sandbox
+		"--runtime=" + runtime, // gVisor (runsc) in prod, runc for local dev
 		"--network=none",           // no network
 		"--read-only",              // immutable filesystem
 		"--tmpfs", "/sandbox:size=64m", // writable temp dir
