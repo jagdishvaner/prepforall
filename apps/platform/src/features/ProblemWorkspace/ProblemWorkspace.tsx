@@ -28,7 +28,7 @@ export function ProblemWorkspace({ slug }: Props) {
   // gets saved before the API returns problem-specific starter code
   let code = getCode(slug, language);
   if (!code && problem) {
-    const starter = problem.starterCode?.[language] ?? DEFAULT_STARTER_CODE[language] ?? '';
+    const starter = problem.starter_code?.[language] ?? DEFAULT_STARTER_CODE[language] ?? '';
     if (starter) {
       code = starter;
       setCode(slug, language, code);
@@ -103,7 +103,7 @@ export function ProblemWorkspace({ slug }: Props) {
             <div className="flex h-full flex-col">
               <EditorToolbar
                 slug={slug}
-                starterCode={problem.starterCode}
+                starterCode={problem.starter_code}
                 isJudging={isJudging}
                 isFullscreen={isFullscreen}
                 onRun={handleRun}

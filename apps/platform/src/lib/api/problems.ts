@@ -9,7 +9,7 @@ export interface Problem {
   acceptanceRate?: number;
   tags: string[];
   languages: string[];
-  starterCode?: Record<string, string>;
+  starter_code?: Record<string, string>;
 }
 
 export interface ProblemListResponse {
