@@ -17,6 +17,21 @@ type Config struct {
 	AWSRegion      string
 	S3Bucket       string
 	AllowedOrigins []string
+
+	// OAuth
+	GoogleClientID     string
+	GoogleClientSecret string
+	GoogleRedirectURL  string
+	GithubClientID     string
+	GithubClientSecret string
+	GithubRedirectURL  string
+
+	// Frontend
+	FrontendURL string
+
+	// Token expiry
+	AccessExpiry  string // e.g. "15m"
+	RefreshExpiry string // e.g. "168h" = 7 days
 }
 
 func Load() *Config {
@@ -32,6 +47,11 @@ func Load() *Config {
 	viper.SetDefault("port", "8080")
 	viper.SetDefault("jwt_expiry", "24h")
 	viper.SetDefault("aws_region", "ap-south-1")
+	viper.SetDefault("access_expiry", "15m")
+	viper.SetDefault("refresh_expiry", "168h")
+	viper.SetDefault("frontend_url", "http://localhost:5173")
+	viper.SetDefault("google_redirect_url", "http://localhost:8080/api/v1/auth/google/callback")
+	viper.SetDefault("github_redirect_url", "http://localhost:8080/api/v1/auth/github/callback")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Printf("No config file found, relying on environment variables: %v", err)
@@ -47,5 +67,15 @@ func Load() *Config {
 		AWSRegion:      viper.GetString("AWS_REGION"),
 		S3Bucket:       viper.GetString("S3_BUCKET"),
 		AllowedOrigins: viper.GetStringSlice("ALLOWED_ORIGINS"),
+
+		GoogleClientID:     viper.GetString("GOOGLE_CLIENT_ID"),
+		GoogleClientSecret: viper.GetString("GOOGLE_CLIENT_SECRET"),
+		GoogleRedirectURL:  viper.GetString("GOOGLE_REDIRECT_URL"),
+		GithubClientID:     viper.GetString("GITHUB_CLIENT_ID"),
+		GithubClientSecret: viper.GetString("GITHUB_CLIENT_SECRET"),
+		GithubRedirectURL:  viper.GetString("GITHUB_REDIRECT_URL"),
+		FrontendURL:        viper.GetString("FRONTEND_URL"),
+		AccessExpiry:       viper.GetString("ACCESS_EXPIRY"),
+		RefreshExpiry:      viper.GetString("REFRESH_EXPIRY"),
 	}
 }

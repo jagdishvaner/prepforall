@@ -1,0 +1,69 @@
+{
+  "hero": {
+    "heading": "Build your coding skills, ace your placements.",
+    "subtext": "Your end-to-end coding platform for practice, assessments & placement preparation.",
+    "primaryCta": { "label": "Request a Demo", "href": "/for-universities" },
+    "secondaryCta": { "label": "Explore Problems", "href": "/problems" },
+    "screenshotSrc": "/images/hero-screenshot.png",
+    "screenshotAlt": "PrepForAll coding workspace with a green Accepted verdict"
+  },
+  "stats": [
+    { "value": 200, "suffix": "+", "label": "Problems" },
+    { "value": 8, "suffix": "+", "label": "Partner Colleges" },
+    { "value": 500, "suffix": "+", "label": "Students Trained" },
+    { "value": 95, "suffix": "%", "label": "Placement Confidence" }
+  ],
+  "offers": [
+    {
+      "iconName": "Code2",
+      "title": "Practice",
+      "description": "200+ DSA & SQL problems with real code execution in a sandboxed environment."
+    },
+    {
+      "iconName": "ClipboardCheck",
+      "title": "Assess",
+      "description": "Timed tests with proctoring. Assign to batches and track completion."
+    },
+    {
+      "iconName": "BarChart3",
+      "title": "Analyze",
+      "description": "Student & batch-wise analytics. Track progress and identify at-risk students."
+    }
+  ],
+  "productPreview": {
+    "heading": "A LeetCode-grade editor, inside your classroom",
+    "tabs": [
+      { "label": "Coding Platform", "screenshotSrc": "/images/preview-editor.png", "screenshotAlt": "Code editor with syntax highlighting" },
+      { "label": "Trainer Dashboard", "screenshotSrc": "/images/preview-dashboard.png", "screenshotAlt": "Trainer dashboard with batch management" },
+      { "label": "Analytics", "screenshotSrc": "/images/preview-analytics.png", "screenshotAlt": "Analytics dashboard with charts" }
+    ]
+  },
+  "howItWorks": {
+    "heading": "How PrepForAll works",
+    "steps": [
+      { "title": "Sign an MOU", "description": "Partner with us through a simple agreement.", "iconName": "FileText" },
+      { "title": "Trainers get access", "description": "Your trainers receive full platform access.", "iconName": "Users" },
+      { "title": "Students enroll", "description": "Students are added to batches by trainers.", "iconName": "GraduationCap" },
+      { "title": "Tests assigned", "description": "Trainers create and assign timed assessments.", "iconName": "ClipboardList" },
+      { "title": "Track progress", "description": "Monitor performance with detailed analytics.", "iconName": "TrendingUp" }
+    ]
+  },
+  "forUniversities": {
+    "heading": "Built for training partners & universities",
+    "bullets": [
+      "Batch management for organized training",
+      "Trainer dashboards with full control",
+      "Exportable reports for NAAC/NIRF accreditation",
+      "Co-branded certificates for students",
+      "Dedicated support from our team"
+    ],
+    "screenshotSrc": "/images/uni-dashboard.png",
+    "ctaLabel": "Learn More",
+    "ctaHref": "/for-universities"
+  },
+  "cta": {
+    "heading": "Ready to transform your classroom?",
+    "ctaLabel": "Request a Demo",
+    "ctaHref": "/for-universities"
+  }
+}

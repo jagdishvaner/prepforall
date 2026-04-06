@@ -1,0 +1,18 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: var(--color-neutral-200);
+  color: var(--color-neutral-600);
+  font-family: var(--font-body);
+  font-weight: var(--font-medium);
+}
+
+.sm { width: 32px; height: 32px; font-size: var(--text-xs); }
+.md { width: 40px; height: 40px; font-size: var(--text-sm); }
+.lg { width: 48px; height: 48px; font-size: var(--text-base); }
+
+.image { width: 100%; height: 100%; object-fit: cover; }

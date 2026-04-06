@@ -4,27 +4,36 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/prepforall/api/internal/problems"
 	"github.com/prepforall/api/pkg/errors"
 	"github.com/prepforall/api/pkg/queue"
+	"github.com/prepforall/api/pkg/storage"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
 type Service struct {
-	repo *Repository
-	rdb  *redis.Client
-	log  *zap.Logger
+	repo        *Repository
+	problemRepo *problems.Repository
+	rdb         *redis.Client
+	s3          *storage.S3Client
+	log         *zap.Logger
 }
 
-func NewService(repo *Repository, rdb *redis.Client, log *zap.Logger) *Service {
-	return &Service{repo: repo, rdb: rdb, log: log}
+func NewService(repo *Repository, problemRepo *problems.Repository, rdb *redis.Client, s3 *storage.S3Client, log *zap.Logger) *Service {
+	return &Service{repo: repo, problemRepo: problemRepo, rdb: rdb, s3: s3, log: log}
 }
 
 func (s *Service) Submit(ctx context.Context, userID string, req SubmitRequest) (*Submission, *errors.AppError) {
+	problem, err := s.problemRepo.FindBySlug(ctx, req.ProblemSlug)
+	if err != nil {
+		return nil, errors.ErrNotFound
+	}
+
 	sub := &Submission{
 		ID:        uuid.NewString(),
 		UserID:    userID,
-		ProblemID: req.ProblemID,
+		ProblemID: problem.ID,
 		Language:  req.Language,
 		Code:      req.Code,
 		Verdict:   "PENDING",
@@ -35,14 +44,22 @@ func (s *Service) Submit(ctx context.Context, userID string, req SubmitRequest) 
 		return nil, errors.ErrInternal
 	}
 
+	testCases, err := s.fetchAllTestCases(ctx, problem.ID)
+	if err != nil {
+		s.log.Error("failed to fetch test cases", zap.String("problemId", problem.ID), zap.Error(err))
+		return nil, errors.ErrInternal
+	}
+
 	job := queue.SubmissionJob{
 		SubmissionID:  sub.ID,
-		ProblemID:     sub.ProblemID,
+		ProblemID:     problem.ID,
 		UserID:        userID,
 		Language:      sub.Language,
 		Code:          sub.Code,
-		TimeLimitMs:   2000,
-		MemoryLimitMB: 256,
+		TimeLimitMs:   problem.TimeLimitMs,
+		MemoryLimitMB: problem.MemoryLimitMB,
+		Mode:          "submit",
+		TestCases:     testCases,
 	}
 
 	if err := queue.EnqueueSubmission(ctx, s.rdb, job); err != nil {
@@ -50,8 +67,89 @@ func (s *Service) Submit(ctx context.Context, userID string, req SubmitRequest) 
 		return nil, errors.ErrInternal
 	}
 
-	sub.Code = "" // don't return code in response
+	sub.Code = ""
 	return sub, nil
+}
+
+func (s *Service) Run(ctx context.Context, userID string, req RunRequest) (*RunResponse, *errors.AppError) {
+	problem, err := s.problemRepo.FindBySlug(ctx, req.ProblemSlug)
+	if err != nil {
+		return nil, errors.ErrNotFound
+	}
+
+	sampleCases, err := s.fetchSampleTestCases(ctx, req.ProblemSlug)
+	if err != nil {
+		s.log.Error("failed to fetch sample test cases", zap.String("slug", req.ProblemSlug), zap.Error(err))
+		return nil, errors.ErrInternal
+	}
+
+	runID := uuid.NewString()
+
+	job := queue.SubmissionJob{
+		SubmissionID:  runID,
+		ProblemID:     problem.ID,
+		UserID:        userID,
+		Language:      req.Language,
+		Code:          req.Code,
+		TimeLimitMs:   problem.TimeLimitMs,
+		MemoryLimitMB: problem.MemoryLimitMB,
+		Mode:          "run",
+		TestCases:     sampleCases,
+	}
+
+	if err := queue.EnqueueSubmission(ctx, s.rdb, job); err != nil {
+		s.log.Error("failed to enqueue run", zap.String("runId", runID), zap.Error(err))
+		return nil, errors.ErrInternal
+	}
+
+	return &RunResponse{RunID: runID}, nil
+}
+
+func (s *Service) fetchAllTestCases(ctx context.Context, problemID string) ([]queue.TestCaseData, error) {
+	cases, err := s.problemRepo.FindAllTestCases(ctx, problemID)
+	if err != nil {
+		return nil, err
+	}
+	return s.resolveTestCaseContent(ctx, cases)
+}
+
+func (s *Service) fetchSampleTestCases(ctx context.Context, slug string) ([]queue.TestCaseData, error) {
+	cases, err := s.problemRepo.FindSampleTestCases(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	return s.resolveTestCaseContent(ctx, cases)
+}
+
+func (s *Service) resolveTestCaseContent(ctx context.Context, cases []*problems.TestCase) ([]queue.TestCaseData, error) {
+	result := make([]queue.TestCaseData, 0, len(cases))
+	for _, tc := range cases {
+		var input, expected string
+		if tc.Input != "" {
+			// S3 key present — fetch from object storage
+			data, err := s.s3.GetObject(ctx, tc.Input)
+			if err != nil {
+				return nil, err
+			}
+			input = string(data)
+		} else {
+			input = tc.InputContent
+		}
+		if tc.Output != "" {
+			data, err := s.s3.GetObject(ctx, tc.Output)
+			if err != nil {
+				return nil, err
+			}
+			expected = string(data)
+		} else {
+			expected = tc.OutputContent
+		}
+		result = append(result, queue.TestCaseData{
+			Input:    input,
+			Expected: expected,
+		})
+	}
+	return result, nil
 }
 
 func (s *Service) GetByID(ctx context.Context, id string) (*Submission, *errors.AppError) {
@@ -59,7 +157,7 @@ func (s *Service) GetByID(ctx context.Context, id string) (*Submission, *errors.
 	if err != nil {
 		return nil, errors.ErrNotFound
 	}
-	sub.Code = "" // hide code on fetch
+	sub.Code = ""
 	return sub, nil
 }
 

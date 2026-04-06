@@ -81,12 +81,14 @@ func (c *ResultConsumer) process(ctx context.Context, msg redis.XMessage) {
 		return
 	}
 
-	if err := c.writeVerdict(ctx, event); err != nil {
-		c.log.Error("failed to write verdict to DB", zap.String("submissionId", event.SubmissionID), zap.Error(err))
-		return
+	// Only write to DB for submit mode (run mode has no submission row)
+	if event.Mode != "run" {
+		if err := c.writeVerdict(ctx, event); err != nil {
+			c.log.Error("failed to write verdict to DB", zap.String("submissionId", event.SubmissionID), zap.Error(err))
+			return
+		}
+		metrics.VerdictTotal.WithLabelValues(event.Verdict, "").Inc()
 	}
-
-	metrics.VerdictTotal.WithLabelValues(event.Verdict, "").Inc()
 
 	notifyPayload, _ := json.Marshal(event)
 	c.hub.Broker().Publish(ctx, event.SubmissionID, notifyPayload)
@@ -97,9 +99,9 @@ func (c *ResultConsumer) process(ctx context.Context, msg redis.XMessage) {
 func (c *ResultConsumer) writeVerdict(ctx context.Context, e queue.ResultEvent) error {
 	_, err := c.db.Exec(ctx,
 		`UPDATE submissions
-		 SET verdict = $1, runtime_ms = $2, memory_kb = $3, judged_at = NOW()
-		 WHERE id = $4`,
-		e.Verdict, e.RuntimeMs, e.MemoryKB, e.SubmissionID,
+		 SET verdict = $1, runtime_ms = $2, memory_kb = $3, passed_cases = $4, total_cases = $5, judged_at = NOW()
+		 WHERE id = $6`,
+		e.Verdict, e.RuntimeMs, e.MemoryKB, e.PassedCases, e.TotalCases, e.SubmissionID,
 	)
 	return err
 }

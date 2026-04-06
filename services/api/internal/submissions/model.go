@@ -19,8 +19,18 @@ type Submission struct {
 }
 
 type SubmitRequest struct {
-	ProblemID string `json:"problem_id"`
-	Language  string `json:"language"`
-	Code      string `json:"code"`
-	ContestID string `json:"contest_id,omitempty"`
+	ProblemSlug string `json:"problem_slug"`
+	Language    string `json:"language"`
+	Code        string `json:"code"`
+	ContestID   string `json:"contest_id,omitempty"`
+}
+
+type RunRequest struct {
+	ProblemSlug string `json:"problem_slug"`
+	Language    string `json:"language"`
+	Code        string `json:"code"`
+}
+
+type RunResponse struct {
+	RunID string `json:"run_id"`
 }

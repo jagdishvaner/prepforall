@@ -1,0 +1,13 @@
+{
+  "name": "@prepforall/tailwind-config",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "main": "index.ts",
+  "files": [
+    "index.ts"
+  ],
+  "devDependencies": {
+    "tailwindcss": "^3.4.1"
+  }
+}

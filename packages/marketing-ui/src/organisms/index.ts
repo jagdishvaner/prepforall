@@ -1,0 +1,13 @@
+export { HeroBlock, type HeroBlockProps } from "./HeroBlock";
+export { StatsSection, type StatsSectionProps } from "./StatsSection";
+export { OfferSection, type OfferSectionProps, type OfferItem } from "./OfferSection";
+export { ProductPreview, type ProductPreviewProps, type ProductTab } from "./ProductPreview";
+export { HowItWorks, type HowItWorksProps, type Step } from "./HowItWorks";
+export { UniversityPartners, type UniversityPartnersProps, type Partner } from "./UniversityPartners";
+export { TestimonialCarousel, type TestimonialCarouselProps } from "./TestimonialCarousel";
+export { PlacementLogos, type PlacementLogosProps, type PlacementCompany } from "./PlacementLogos";
+export { CTASection, type CTASectionProps } from "./CTASection";
+export { PricingBlock, type PricingBlockProps } from "./PricingBlock";
+export { ContactForm, type ContactFormProps, type ContactFormFields } from "./ContactForm";
+export { Header, type HeaderProps, type NavLink } from "./Header";
+export { Footer, type FooterProps, type FooterColumn, type SocialLink } from "./Footer";

@@ -1,0 +1,25 @@
+/* @prepforall/css — Base styles
+ * Imports tokens and sets up global resets.
+ */
+@import "@prepforall/tokens";
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-neutral-900);
+  background-color: var(--color-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark body {
+  color: var(--color-neutral-900);
+  background-color: var(--color-surface);
+}

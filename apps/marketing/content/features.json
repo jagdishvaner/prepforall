@@ -1,0 +1,42 @@
+{
+  "heading": "Everything you need to build coding excellence",
+  "features": [
+    {
+      "title": "Code Editor",
+      "description": "Monaco editor with multi-language support, auto-complete, dark/light themes, and syntax highlighting.",
+      "screenshotSrc": "/images/features/editor.png",
+      "iconName": "Code2"
+    },
+    {
+      "title": "Sandboxed Execution",
+      "description": "gVisor isolation for 6 languages plus SQL. Instant verdicts with resource limits and zero network access.",
+      "screenshotSrc": "/images/features/sandbox.png",
+      "iconName": "Shield"
+    },
+    {
+      "title": "Contests",
+      "description": "Rated contests with live leaderboards. ICPC and IOI-style formats with real-time scoring.",
+      "screenshotSrc": "/images/features/contests.png",
+      "iconName": "Trophy"
+    },
+    {
+      "title": "Test Engine",
+      "description": "Timed tests with batch assignment, proctoring, and company-specific templates (TCS, Infosys, Cognizant).",
+      "screenshotSrc": "/images/features/tests.png",
+      "iconName": "ClipboardCheck"
+    },
+    {
+      "title": "Analytics",
+      "description": "Topic breakdown, heatmaps, at-risk student flags, and exportable reports for NAAC/NIRF.",
+      "screenshotSrc": "/images/features/analytics.png",
+      "iconName": "BarChart3"
+    },
+    {
+      "title": "Mock Interviews",
+      "description": "Video plus collaborative coding for 1-on-1 mock interview sessions. Coming soon.",
+      "screenshotSrc": "/images/features/interviews.png",
+      "iconName": "Video",
+      "comingSoon": true
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "name": "@prepforall/css",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "main": "./dist/index.css",
+  "exports": {
+    ".": "./dist/index.css",
+    "./components/*": "./dist/components/*.module.css"
+  },
+  "files": [
+    "dist/**/*.css"
+  ],
+  "scripts": {
+    "build:css": "node scripts/build.js",
+    "dev": "node scripts/build.js --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@prepforall/tokens": "workspace:*"
+  },
+  "devDependencies": {
+    "@prepforall/postcss-config": "workspace:*",
+    "glob": "^11.0.0",
+    "postcss": "^8.4.38",
+    "postcss-cli": "^11.0.0",
+    "postcss-modules": "^6.0.1"
+  }
+}

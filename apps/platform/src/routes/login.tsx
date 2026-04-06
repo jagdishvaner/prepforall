@@ -1,0 +1,228 @@
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
+import { useAuthStore } from '@/stores/authStore';
+import { apiClient } from '@/lib/apiClient';
+import { openOAuthPopup } from '@/features/Auth/OAuthPopup';
+import { toast } from 'sonner';
+
+export const Route = createFileRoute('/login')({
+  component: LoginPage,
+});
+
+function LoginPage() {
+  const { setAuth } = useAuthStore();
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleEmailLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const { data } = await apiClient.post('/api/v1/auth/login', { email, password });
+      setAuth(data.access_token);
+      toast.success('Welcome back!');
+      navigate({ to: '/dashboard' });
+    } catch {
+      toast.error('Invalid email or password');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOAuth = async (provider: 'google' | 'github') => {
+    try {
+      const token = await openOAuthPopup(provider);
+      setAuth(token);
+      toast.success('Welcome back!');
+      navigate({ to: '/dashboard' });
+    } catch (err) {
+      if (err instanceof Error && err.message !== 'Login cancelled') {
+        toast.error(err.message);
+      }
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen font-sans">
+      {/* Left panel — brand */}
+      <div className="hidden w-[480px] flex-col justify-between bg-brand-dark p-12 lg:flex">
+        <div>
+          <a href="http://localhost:3001" className="flex items-center gap-3">
+            <img
+              src="/images/logo.jpeg"
+              alt="PrepForAll"
+              className="h-10 w-auto brightness-0 invert"
+              style={{ clipPath: 'inset(0 0 52% 0)' }}
+            />
+            <span className="font-heading text-xl font-bold tracking-tight text-white">
+              PrepForAll
+            </span>
+          </a>
+          <div className="mt-16">
+            <h2 className="font-heading text-4xl font-semibold leading-tight tracking-tight text-white">
+              Build your coding skills, ace your placements.
+            </h2>
+            <p className="mt-6 text-lg leading-relaxed text-neutral-400">
+              Practice DSA & SQL problems, take assessments, and track your progress — all in one platform.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center gap-4 rounded-xl bg-white/5 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/20">
+              <svg className="h-5 w-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-white">200+ Problems</p>
+              <p className="text-xs text-neutral-500">DSA & SQL with real execution</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 rounded-xl bg-white/5 p-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-primary/20">
+              <svg className="h-5 w-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-white">Track Progress</p>
+              <p className="text-xs text-neutral-500">Analytics & placement insights</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right panel — form */}
+      <div className="flex flex-1 items-center justify-center bg-surface-warm px-6">
+        <div className="w-full max-w-[420px]">
+          {/* Mobile logo */}
+          <div className="mb-8 text-center lg:hidden">
+            <h1 className="font-heading text-2xl font-bold tracking-tight text-text-primary">
+              Prep<span className="text-brand-primary">ForAll</span>
+            </h1>
+          </div>
+
+          <div className="hidden lg:block">
+            <h1 className="font-heading text-3xl font-semibold tracking-tight text-text-primary">
+              Welcome back
+            </h1>
+            <p className="mt-2 text-sm text-text-secondary">
+              Sign in to continue to your dashboard
+            </p>
+          </div>
+
+          {/* Card */}
+          <div className="mt-8 rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
+            {/* OAuth buttons */}
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => handleOAuth('google')}
+                className="flex items-center justify-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-sm font-medium text-text-primary transition-colors hover:bg-neutral-50"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Continue with Google
+              </button>
+              <button
+                onClick={() => handleOAuth('github')}
+                className="flex items-center justify-center gap-3 rounded-lg border border-neutral-200 px-4 py-3 text-sm font-medium text-text-primary transition-colors hover:bg-neutral-50"
+              >
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                Continue with GitHub
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="my-6 flex items-center gap-4">
+              <div className="h-px flex-1 bg-neutral-200" />
+              <span className="text-xs font-medium text-neutral-400">OR</span>
+              <div className="h-px flex-1 bg-neutral-200" />
+            </div>
+
+            {/* Email/password form */}
+            <form onSubmit={handleEmailLogin} className="flex flex-col gap-4">
+              <div>
+                <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-text-primary">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@university.edu"
+                  className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 text-sm text-text-primary placeholder:text-neutral-400 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/10"
+                />
+              </div>
+              <div>
+                <div className="mb-1.5 flex items-center justify-between">
+                  <label htmlFor="password" className="text-sm font-medium text-text-primary">
+                    Password
+                  </label>
+                  <a href="/auth/forgot-password" className="text-xs font-medium text-brand-primary transition-colors hover:underline">
+                    Forgot password?
+                  </a>
+                </div>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    className="w-full rounded-lg border border-neutral-200 bg-white px-4 py-3 pr-12 text-sm text-text-primary placeholder:text-neutral-400 focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-neutral-400"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                      </svg>
+                    ) : (
+                      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="mt-2 rounded-lg bg-brand-primary px-4 py-3 text-sm font-semibold text-white transition-all hover:brightness-110 disabled:opacity-50"
+              >
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-text-secondary">
+              No account? Contact your organization admin for an invite.
+            </p>
+          </div>
+
+          <p className="mt-6 text-center text-xs text-neutral-400">
+            &copy; 2026 PrepForAll. All rights reserved.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

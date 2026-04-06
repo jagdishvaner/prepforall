@@ -1,0 +1,87 @@
+<h2>Architecture Approach for Sub-project 1</h2>
+<p class="subtitle">Monorepo restructure + Frontend split + OVH K8s deployment — pick the approach that fits</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Big Bang Migration</h3>
+      <p>Restructure the entire repo in one go: add Turborepo, split frontend into marketing + platform apps, set up K8s manifests, CI/CD — then deploy everything together.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Clean break — no transitional state</li>
+            <li>Everything works together from day one</li>
+            <li>One PR to review</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Large risky change — hard to debug if something breaks</li>
+            <li>Weeks before anything is deployable</li>
+            <li>Existing working code gets disrupted</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Incremental Migration (Recommended)</h3>
+      <p>Migrate in 4 ordered steps, each independently deployable and testable:</p>
+      <ol style="margin:8px 0;padding-left:20px;color:#cbd5e1;">
+        <li><strong>Step 1:</strong> Add Turborepo + shared packages (ui, types, config). Existing apps/web keeps working.</li>
+        <li><strong>Step 2:</strong> Create apps/marketing (Next.js) — extract public/SEO pages from apps/web.</li>
+        <li><strong>Step 3:</strong> Create apps/platform (Vite + TanStack) — migrate authenticated pages.</li>
+        <li><strong>Step 4:</strong> Dockerize everything + K8s manifests + CI/CD for OVH.</li>
+      </ol>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Each step is small, testable, and reversible</li>
+            <li>Working software at every stage</li>
+            <li>Can ship Step 1-2 while Step 3-4 are in progress</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>Transitional period where old and new coexist</li>
+            <li>Slightly more total git history</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Platform-First (Skip Marketing)</h3>
+      <p>Build only apps/platform (Vite + TanStack) + K8s deployment. Skip the marketing site entirely for now — use a simple Notion page or Carrd for the landing page.</p>
+      <div class="pros-cons">
+        <div class="pros">
+          <h4>Pros</h4>
+          <ul>
+            <li>Fastest path to a working product</li>
+            <li>Marketing site can be built independently later</li>
+            <li>Focus all energy on the core platform</li>
+          </ul>
+        </div>
+        <div class="cons">
+          <h4>Cons</h4>
+          <ul>
+            <li>No SEO presence at launch</li>
+            <li>Marketing site retrofit later needs careful routing</li>
+            <li>Less professional appearance for university pitches</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

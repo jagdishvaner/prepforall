@@ -43,9 +43,18 @@ services:
       REDIS_ADDR: redis:6379
       JWT_SECRET: dev-super-secret-change-in-production
       JWT_EXPIRY: 24h
+      ACCESS_EXPIRY: 1h
+      REFRESH_EXPIRY: 168h
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URL: http://localhost:8080/api/v1/auth/google/callback
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      GITHUB_REDIRECT_URL: http://localhost:8080/api/v1/auth/github/callback
+      FRONTEND_URL: http://localhost:5173
       AWS_REGION: ap-south-1
       S3_BUCKET: prepforall-dev
-      ALLOWED_ORIGINS: '["http://localhost:3000"]'
+      ALLOWED_ORIGINS: '["http://localhost:3000","http://localhost:5173"]'
     depends_on:
       postgres:
         condition: service_healthy
@@ -60,13 +69,18 @@ services:
     container_name: prepforall_judge
     environment:
       REDIS_ADDR: redis:6379
+      SANDBOX_RUNTIME: runc  # use runc for local dev (gVisor needs Linux kernel)
+      JUDGE_WORK_DIR: /var/lib/docker/judge-work  # shared bind mount path
+      JUDGE_VOLUME_NAME: /var/lib/docker/judge-work  # same path for sandbox bind mount
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/judge-work:/var/lib/docker/judge-work
     depends_on:
       redis:
         condition: service_healthy
     restart: unless-stopped
 
+  # Legacy app (remove after migration to marketing + platform)
   web:
     build:
       context: ./apps/web
@@ -80,6 +94,39 @@ services:
     depends_on:
       - api
     restart: unless-stopped
+    profiles:
+      - legacy
+
+  marketing:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.marketing
+    container_name: prepforall_marketing
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    depends_on:
+      - api
+    restart: unless-stopped
+    profiles:
+      - monorepo
+
+  platform:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/Dockerfile.platform
+    container_name: prepforall_platform
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:8080
+      VITE_WS_URL: ws://localhost:8080
+    depends_on:
+      - api
+    restart: unless-stopped
+    profiles:
+      - monorepo
 
   prometheus:
     image: prom/prometheus:v2.55.1
@@ -97,7 +144,6 @@ services:
       - "3001:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./infrastructure/observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
     environment:
       GF_SECURITY_ADMIN_PASSWORD: admin
     depends_on:
@@ -127,3 +173,4 @@ volumes:
   postgres_data:
   redis_data:
   grafana_data:
+  judge-work:

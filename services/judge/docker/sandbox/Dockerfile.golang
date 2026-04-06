@@ -1,0 +1,7 @@
+FROM golang:1.23-bookworm
+
+RUN useradd -m -u 1000 sandbox
+USER sandbox
+WORKDIR /sandbox
+
+# No entrypoint — runner injects the command

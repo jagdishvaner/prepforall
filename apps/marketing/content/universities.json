@@ -1,0 +1,23 @@
+{
+  "partners": [
+    { "name": "SRM University", "logoSrc": "/images/universities/srm.png" },
+    { "name": "VIT University", "logoSrc": "/images/universities/vit.png" },
+    { "name": "SASTRA University", "logoSrc": "/images/universities/sastra.png" },
+    { "name": "Manipal Institute", "logoSrc": "/images/universities/manipal.png" },
+    { "name": "NIT Trichy", "logoSrc": "/images/universities/nit-trichy.png" },
+    { "name": "PSG College of Technology", "logoSrc": "/images/universities/psg.png" },
+    { "name": "CIT", "logoSrc": "/images/universities/cit.png" }
+  ],
+  "placements": [
+    { "name": "Microsoft", "logoSrc": "/images/companies/microsoft.png" },
+    { "name": "Google", "logoSrc": "/images/companies/google.png" },
+    { "name": "Amazon", "logoSrc": "/images/companies/amazon.png" },
+    { "name": "TCS", "logoSrc": "/images/companies/tcs.png" },
+    { "name": "Infosys", "logoSrc": "/images/companies/infosys.png" },
+    { "name": "Wipro", "logoSrc": "/images/companies/wipro.png" },
+    { "name": "Accenture", "logoSrc": "/images/companies/accenture.png" },
+    { "name": "Deloitte", "logoSrc": "/images/companies/deloitte.png" },
+    { "name": "Cognizant", "logoSrc": "/images/companies/cognizant.png" },
+    { "name": "Capgemini", "logoSrc": "/images/companies/capgemini.png" }
+  ]
+}
